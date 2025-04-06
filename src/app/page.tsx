@@ -55,9 +55,12 @@ export default function Home(): JSX.Element {
           >
             <BsTwitterX className="mr-1" /> Follow Our Journey
           </Link>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition">
+          <a
+            href="#waitlist"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition"
+          >
             Join Waitlist
-          </button>
+          </a>
         </div>
       </nav>
 
@@ -112,7 +115,9 @@ export default function Home(): JSX.Element {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>Process hundreds of documents at once</span>
+                <span className="text-gray-700">
+                  Process hundreds of documents at once
+                </span>
               </li>
               <li className="flex items-start">
                 <svg
@@ -128,7 +133,9 @@ export default function Home(): JSX.Element {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>Extract specific fields or entire forms</span>
+                <span className="text-gray-700">
+                  Extract specific fields or entire forms
+                </span>
               </li>
               <li className="flex items-start">
                 <svg
@@ -144,7 +151,9 @@ export default function Home(): JSX.Element {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>Create reusable extraction templates</span>
+                <span className="text-gray-700">
+                  Create reusable extraction templates
+                </span>
               </li>
               <li className="flex items-start">
                 <svg
@@ -160,7 +169,9 @@ export default function Home(): JSX.Element {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>Export to CSV, Excel, or JSON</span>
+                <span className="text-gray-700">
+                  Export to CSV, Excel, or JSON
+                </span>
               </li>
               <li className="flex items-start">
                 <svg
@@ -176,7 +187,9 @@ export default function Home(): JSX.Element {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span>Integrate with your existing systems</span>
+                <span className="text-gray-700">
+                  Integrate with your existing systems
+                </span>
               </li>
             </ul>
           </div>
@@ -195,7 +208,7 @@ export default function Home(): JSX.Element {
               <div className="bg-blue-100 p-3 rounded-lg inline-block mb-4">
                 <IoDocumentTextOutline size={24} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
                 Smart Data Extraction
               </h3>
               <p className="text-gray-600">
@@ -211,7 +224,9 @@ export default function Home(): JSX.Element {
                   className="text-blue-600"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Batch Processing</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                Batch Processing
+              </h3>
               <p className="text-gray-600">
                 Process hundreds of documents at once, saving hours of manual
                 data entry. Our system efficiently handles large volumes.
@@ -222,7 +237,9 @@ export default function Home(): JSX.Element {
               <div className="bg-blue-100 p-3 rounded-lg inline-block mb-4">
                 <TbFileExport size={24} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Flexible Exports</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                Flexible Exports
+              </h3>
               <p className="text-gray-600">
                 Export extracted data to CSV, Excel, JSON or integrate directly
                 with accounting software and ERP systems.
@@ -233,7 +250,7 @@ export default function Home(): JSX.Element {
               <div className="bg-blue-100 p-3 rounded-lg inline-block mb-4">
                 <FaRegLightbulb size={24} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
                 AI-Powered Accuracy
               </h3>
               <p className="text-gray-600">
@@ -246,7 +263,7 @@ export default function Home(): JSX.Element {
               <div className="bg-blue-100 p-3 rounded-lg inline-block mb-4">
                 <AiOutlineApi size={24} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
                 Powerful Extraction Templates
               </h3>
               <p className="text-gray-600">
@@ -260,7 +277,9 @@ export default function Home(): JSX.Element {
               <div className="bg-blue-100 p-3 rounded-lg inline-block mb-4">
                 <AiOutlineApi size={24} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">API Access</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                API Access{" "}
+              </h3>
               <p className="text-gray-600">
                 Integrate FormSense directly into your workflow with our
                 developer-friendly API for seamless automation.
@@ -400,7 +419,11 @@ export default function Home(): JSX.Element {
             Flexible plans to meet your document processing needs. Early
             adopters will receive special pricing.
           </p>
-
+          <p className="text-amber-600 font-medium italic mb-10 max-w-3xl mx-auto">
+            NOTE: These prices are not final and may change before our official
+            launch. Join our waitlist to be notified of our final pricing
+            structure.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition">
               <h3 className="text-xl font-bold mb-2">Basic</h3>
@@ -408,7 +431,7 @@ export default function Home(): JSX.Element {
                 For individuals and small businesses
               </p>
               <p className="text-4xl font-bold mb-6">
-                $XX<span className="text-lg text-gray-500">/month</span>
+                $19.9<span className="text-lg text-gray-500">/month</span>
               </p>
               <ul className="text-left space-y-3 mb-8">
                 <li className="flex items-start">
@@ -425,7 +448,9 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Process up to XX documents/month</span>
+                  <span className="text-gray-700">
+                    Process up to 100 documents/month
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -441,7 +466,9 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Basic field extraction</span>
+                  <span className="text-gray-700">
+                    Full field extraction capabilities
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -457,12 +484,31 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>CSV/Excel export</span>
+                  <span className="text-gray-700">All export formats</span>
+                </li>
+                <li className="flex items-start">
+                  <svg
+                    className="h-6 w-6 text-green-500 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span className="text-gray-700">Standard support</span>
                 </li>
               </ul>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
+              <a
+                href="#waitlist"
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+              >
                 Join Waitlist
-              </button>
+              </a>
             </div>
 
             <div className="border-2 border-blue-600 rounded-lg p-8 shadow-lg relative">
@@ -472,7 +518,7 @@ export default function Home(): JSX.Element {
               <h3 className="text-xl font-bold mb-2">Professional</h3>
               <p className="text-gray-500 mb-4">For growing teams</p>
               <p className="text-4xl font-bold mb-6">
-                $XX<span className="text-lg text-gray-500">/month</span>
+                $49.9<span className="text-lg text-gray-500">/month</span>
               </p>
               <ul className="text-left space-y-3 mb-8">
                 <li className="flex items-start">
@@ -489,7 +535,9 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Process up to XX documents/month</span>
+                  <span className="text-gray-700">
+                    Process up to 500 documents/month
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -505,7 +553,9 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Advanced field extraction</span>
+                  <span className="text-gray-700">
+                    Custom configuration options
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -521,7 +571,7 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Template management</span>
+                  <span className="text-gray-700">Batch processing tools</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -537,12 +587,15 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>All export formats</span>
+                  <span className="text-gray-700">Priority support</span>
                 </li>
               </ul>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
+              <a
+                href="#waitlist"
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+              >
                 Join Waitlist
-              </button>
+              </a>
             </div>
 
             <div className="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition">
@@ -564,7 +617,7 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Unlimited documents</span>
+                  <span className="text-gray-700">Unlimited documents</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -580,7 +633,9 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Custom field extraction</span>
+                  <span className="text-gray-700">
+                    Custom tailored solutions
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -596,7 +651,7 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>API access</span>
+                  <span className="text-gray-700">API access</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -612,12 +667,15 @@ export default function Home(): JSX.Element {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Dedicated support</span>
+                  <span className="text-gray-700">Dedicated support</span>
                 </li>
               </ul>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
+              <a
+                href="#waitlist"
+                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+              >
                 Contact Us
-              </button>
+              </a>
             </div>
           </div>
         </div>
