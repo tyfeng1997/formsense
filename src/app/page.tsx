@@ -31,7 +31,7 @@ export const metadata = {
   },
 };
 
-export default function Home(): JSX.Element {
+export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       {/* Navigation */}
@@ -328,9 +328,9 @@ export default function Home(): JSX.Element {
               </div>
               <p className="text-gray-600 ml-14">
                 Design extraction templates with our intuitive template builder.
-                Specify exactly what data to extract - whether it's specific
-                fields like totals and dates, or the entire form structure.
-                Templates are saved for reuse.
+                Specify exactly what data to extract - whether it&apos;s
+                specific fields like totals and dates, or the entire form
+                structure. Templates are saved for reuse.
               </p>
             </div>
 
@@ -388,7 +388,9 @@ export default function Home(): JSX.Element {
       {/* Building in Public */}
       <section className="py-20 px-8 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">We're Building in Public</h2>
+          <h2 className="text-3xl font-bold mb-6">
+            We&apos;re Building in Public
+          </h2>
           <p className="text-xl mb-8">
             Follow our journey as we develop FormSense from concept to launch.
             Get early access, influence feature development, and see behind the
