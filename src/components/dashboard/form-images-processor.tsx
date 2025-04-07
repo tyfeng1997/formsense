@@ -20,6 +20,7 @@ import { useTemplates } from "@/components/template/template-context";
 import { Template } from "@/lib/template-storage";
 import { TemplateSelectionDialog } from "./template-selection-dialog";
 import { toast } from "sonner";
+import { TaskCard } from "@/components/task-card";
 
 type FormImage = {
   id: string;
@@ -39,6 +40,24 @@ type ExtractionResult = {
   };
 };
 
+type TaskStatus = {
+  id: string;
+  type: string;
+  processing_status: string;
+  request_counts: {
+    processing: number;
+    succeeded: number;
+    errored: number;
+    canceled: number;
+    expired: number;
+  };
+  ended_at: string | null;
+  created_at: string;
+  expires_at: string;
+  cancel_initiated_at: string | null;
+  results_url: string | null;
+};
+
 export function FormImagesProcessor() {
   const router = useRouter();
 
@@ -56,6 +75,7 @@ export function FormImagesProcessor() {
     useState(false);
   const [results, setResults] = useState<ExtractionResult[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [currentTask, setCurrentTask] = useState<TaskStatus | null>(null);
 
   // Calculate selected images count
   const selectedImagesCount = images.filter((img) => img.selected).length;
@@ -177,10 +197,13 @@ export function FormImagesProcessor() {
 
     setIsExtracting(true);
     setShowExtractionDialog(false);
+    // 重置当前任务和结果
+    setCurrentTask(null);
+    setResults([]);
 
     // 显示提取中的加载状态
     const toastId = toast.loading(
-      `Extracting data from ${selectedImages.length} image${
+      `Submitting extraction task for ${selectedImages.length} image${
         selectedImages.length > 1 ? "s" : ""
       }...`
     );
@@ -213,30 +236,30 @@ export function FormImagesProcessor() {
         throw new Error(`API request failed with status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const taskData = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
+      if (taskData.error) {
+        throw new Error(taskData.error);
       }
 
-      // 更新结果
-      setResults(data.results);
+      // 设置当前任务
+      setCurrentTask(taskData);
 
       // 更新加载状态为成功
       toast.success(
-        `Successfully extracted data from ${selectedImages.length} image${
-          selectedImages.length > 1 ? "s" : ""
-        }.`,
+        `Task submitted successfully. Processing ${
+          selectedImages.length
+        } image${selectedImages.length > 1 ? "s" : ""}.`,
         {
           id: toastId,
-          description: "You can now view and edit the results.",
+          description: "You can track the task progress below.",
         }
       );
     } catch (error) {
       console.error("Extraction error:", error);
 
       // 更新加载状态为失败
-      toast.error("Failed to extract data", {
+      toast.error("Failed to submit extraction task", {
         id: toastId,
         description:
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -249,6 +272,12 @@ export function FormImagesProcessor() {
   const handleCreateTemplate = () => {
     // Navigate to templates page with a query parameter to trigger template creation
     router.push("/dashboard/templates?create=true");
+  };
+
+  // Handle task completion
+  const handleTaskComplete = (extractionResults: ExtractionResult[]) => {
+    setResults(extractionResults);
+    setCurrentTask(null); // 可选：完成后清除任务状态
   };
 
   // Handle updating results after editing
@@ -457,6 +486,14 @@ export function FormImagesProcessor() {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Task Status Section */}
+      {currentTask && (
+        <TaskCard
+          initialTask={currentTask}
+          onTaskComplete={handleTaskComplete}
+        />
       )}
 
       {/* Results Section */}

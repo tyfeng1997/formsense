@@ -1,5 +1,6 @@
 // app/api/extract/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,17 +51,87 @@ export async function POST(request: NextRequest) {
       }))
     );
 
-    // 在实际场景中，这里会处理图像并提取数据
-    // 现在我们只是返回模拟结果
+    // 生成唯一任务ID并存储相关信息（在真实场景中，这会存储在数据库中）
+    const taskId = `msgbatch_${randomUUID().replace(/-/g, "")}`;
+
+    // 这里只是返回任务ID和状态，而不是立即返回结果
+    // 在实际场景中，我们会将任务添加到队列中异步处理
+    const now = new Date();
+    const expiresAt = new Date(now);
+    expiresAt.setDate(expiresAt.getDate() + 1); // 24小时后过期
+
+    const taskStatus = {
+      id: taskId,
+      type: "message_batch",
+      processing_status: "in_progress",
+      request_counts: {
+        processing: imageIds.length,
+        succeeded: 0,
+        errored: 0,
+        canceled: 0,
+        expired: 0,
+      },
+      ended_at: null,
+      created_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      cancel_initiated_at: null,
+      results_url: null,
+      // 在实际场景中，我们会将以下数据存储在数据库中
+      _internal: {
+        imageIds,
+        templateId: template.id,
+        template,
+      },
+    };
+
+    // 模拟存储任务（在实际场景中，这会存储在数据库中）
+    // 这里我们使用一个全局变量模拟数据库
+    if (!global.tasks) {
+      global.tasks = new Map();
+    }
+    global.tasks.set(taskId, taskStatus);
+
+    // 模拟异步处理 - 在后台处理任务
+    setTimeout(() => {
+      processTaskInBackground(taskId, imageIds, template, imageFiles);
+    }, 100);
+
+    return NextResponse.json(taskStatus);
+  } catch (error) {
+    console.error("Extract API error:", error);
+    return NextResponse.json(
+      { error: "Failed to process extraction request" },
+      { status: 500 }
+    );
+  }
+}
+
+// 模拟后台处理任务
+async function processTaskInBackground(
+  taskId: string,
+  imageIds: string[],
+  template: any,
+  imageFiles: File[]
+) {
+  if (!global.tasks || !global.tasks.has(taskId)) {
+    console.error(`Task ${taskId} not found`);
+    return;
+  }
+
+  const task = global.tasks.get(taskId);
+
+  try {
+    // 模拟处理时间 - 每个图像需要2-5秒
+    const processingTime = Math.floor(Math.random() * 3000) + 2000;
 
     // 创建结果，使用模板字段
-    const mockResults = imageIds.map((imageId, index) => {
+    const results = imageIds.map((imageId, index) => {
       const imageFile = imageFiles[index];
 
       // 为模板中的每个字段创建一个结果
       const fields: Record<string, string> = {};
       template.fields.forEach((field: any) => {
-        fields[field.name] = `TEST PASS - ${field.name}`;
+        fields[field.name] = `Extracted ${field.name} from ${imageFile.name}`;
       });
 
       return {
@@ -75,16 +146,28 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // 模拟处理时间
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // 等待模拟处理时间
+    await new Promise((resolve) => setTimeout(resolve, processingTime));
 
-    return NextResponse.json({ results: mockResults });
+    // 更新任务状态为完成
+    task.processing_status = "completed";
+    task.request_counts.processing = 0;
+    task.request_counts.succeeded = imageIds.length;
+    task.ended_at = new Date().toISOString();
+    task.results = results; // 存储提取结果
+
+    global.tasks.set(taskId, task);
   } catch (error) {
-    console.error("Extract API error:", error);
-    return NextResponse.json(
-      { error: "Failed to process extraction request" },
-      { status: 500 }
-    );
+    console.error(`Error processing task ${taskId}:`, error);
+
+    // 更新任务状态为错误
+    task.processing_status = "error";
+    task.request_counts.processing = 0;
+    task.request_counts.errored = imageIds.length;
+    task.ended_at = new Date().toISOString();
+    task.error = "Failed to process extraction request";
+
+    global.tasks.set(taskId, task);
   }
 }
 
