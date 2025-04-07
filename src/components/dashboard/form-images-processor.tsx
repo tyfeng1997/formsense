@@ -19,11 +19,13 @@ import { ExtractedResults } from "./extracted-results";
 import { useTemplates } from "@/components/template/template-context";
 import { Template } from "@/lib/template-storage";
 import { TemplateSelectionDialog } from "./template-selection-dialog";
+import { toast } from "sonner";
 
 type FormImage = {
   id: string;
   name: string;
   url: string;
+  file: File; // 存储原始文件对象
   selected: boolean;
 };
 
@@ -31,10 +33,15 @@ type ExtractionResult = {
   imageId: string;
   imageName: string;
   fields: Record<string, string>;
+  metadata?: {
+    fileSize: number;
+    fileType: string;
+  };
 };
 
 export function FormImagesProcessor() {
   const router = useRouter();
+
   const {
     templates,
     selectedTemplate,
@@ -88,17 +95,43 @@ export function FormImagesProcessor() {
     // Only process image files
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
-    const newImages: FormImage[] = imageFiles.map((file) => ({
-      id: `image-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      name: file.name,
-      url: URL.createObjectURL(file),
-      selected: false, // Default to not selected
-    }));
+    if (imageFiles.length === 0) {
+      toast.error("No valid image files found", {
+        description: "Please upload JPG, PNG, JPEG, or WEBP files.",
+      });
+      return;
+    }
+
+    const newImages: FormImage[] = imageFiles.map((file) => {
+      const id = `image-${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2, 9)}`;
+      return {
+        id,
+        name: file.name,
+        url: URL.createObjectURL(file),
+        file, // 保存文件对象
+        selected: false,
+      };
+    });
 
     setImages((prev) => [...prev, ...newImages]);
+
+    toast.success(
+      `${imageFiles.length} image${imageFiles.length > 1 ? "s" : ""} uploaded`,
+      {
+        description: "Select images and a template to extract data.",
+      }
+    );
   };
 
   const handleRemoveImage = (imageId: string) => {
+    // 释放URL对象
+    const imageToRemove = images.find((img) => img.id === imageId);
+    if (imageToRemove) {
+      URL.revokeObjectURL(imageToRemove.url);
+    }
+
     setImages((prev) => prev.filter((img) => img.id !== imageId));
     // Also remove any extraction results for this image
     setResults((prev) => prev.filter((result) => result.imageId !== imageId));
@@ -125,102 +158,90 @@ export function FormImagesProcessor() {
   };
 
   const handleExtractWithTemplate = async (template: Template) => {
+    if (!template) {
+      toast.error("No template selected", {
+        description: "Please select a template before extracting data.",
+      });
+      return;
+    }
+
+    // Get selected images
+    const selectedImages = images.filter((img) => img.selected);
+
+    if (selectedImages.length === 0) {
+      toast.error("No images selected", {
+        description: "Please select at least one image to extract data from.",
+      });
+      return;
+    }
+
     setIsExtracting(true);
     setShowExtractionDialog(false);
 
-    try {
-      // Get selected images
-      const selectedImages = images.filter((img) => img.selected);
+    // 显示提取中的加载状态
+    const toastId = toast.loading(
+      `Extracting data from ${selectedImages.length} image${
+        selectedImages.length > 1 ? "s" : ""
+      }...`
+    );
 
+    try {
       // Set the selected template if not already set
       if (!selectedTemplate || selectedTemplate.id !== template.id) {
         selectTemplate(template.id);
       }
 
-      // Mock extraction based on template fields
-      setTimeout(() => {
-        const mockResults: ExtractionResult[] = selectedImages.map((img) => {
-          // Create a fields object with mock data for each field in the template
-          const fields: Record<string, string> = {};
+      // 准备 FormData
+      const formData = new FormData();
 
-          template.fields.forEach((field) => {
-            // Generate appropriate mock data based on field name
-            const fieldNameLower = field.name.toLowerCase();
+      // 添加模板数据
+      formData.append("template", JSON.stringify(template));
 
-            if (
-              fieldNameLower.includes("invoice") ||
-              fieldNameLower.includes("number")
-            ) {
-              fields[field.name] = "INV-" + Math.floor(Math.random() * 10000);
-            } else if (
-              fieldNameLower.includes("date") ||
-              fieldNameLower.includes("purchase")
-            ) {
-              fields[field.name] =
-                "2023-" +
-                (Math.floor(Math.random() * 12) + 1) +
-                "-" +
-                (Math.floor(Math.random() * 28) + 1);
-            } else if (
-              fieldNameLower.includes("total") ||
-              fieldNameLower.includes("amount") ||
-              fieldNameLower.includes("price")
-            ) {
-              fields[field.name] = "$" + (Math.random() * 1000).toFixed(2);
-            } else if (
-              fieldNameLower.includes("vendor") ||
-              fieldNameLower.includes("store") ||
-              fieldNameLower.includes("company")
-            ) {
-              fields[field.name] = "TEST COMPANY";
-            } else if (
-              fieldNameLower.includes("payment") ||
-              fieldNameLower.includes("method")
-            ) {
-              const methods = ["CREDIT CARD", "CASH", "DEBIT", "PAYPAL"];
-              fields[field.name] =
-                methods[Math.floor(Math.random() * methods.length)];
-            } else if (fieldNameLower.includes("email")) {
-              fields[field.name] = "test@example.com";
-            } else if (fieldNameLower.includes("phone")) {
-              fields[field.name] =
-                "+1 (555) 123-" +
-                Math.floor(Math.random() * 10000)
-                  .toString()
-                  .padStart(4, "0");
-            } else if (
-              fieldNameLower.includes("name") &&
-              !fieldNameLower.includes("company") &&
-              !fieldNameLower.includes("store")
-            ) {
-              fields[field.name] = "John Doe";
-            } else if (
-              fieldNameLower.includes("title") ||
-              fieldNameLower.includes("position")
-            ) {
-              fields[field.name] = "Product Manager";
-            } else if (
-              fieldNameLower.includes("items") ||
-              fieldNameLower.includes("products")
-            ) {
-              fields[field.name] = "Item 1, Item 2, Item 3";
-            } else {
-              fields[field.name] = "TEST DATA";
-            }
-          });
+      // 添加所有选定的图像文件
+      selectedImages.forEach((image) => {
+        // 使用格式 'image_<id>' 来标识每个图像
+        formData.append(`image_${image.id}`, image.file);
+      });
 
-          return {
-            imageId: img.id,
-            imageName: img.name,
-            fields,
-          };
-        });
+      // 发送提取请求
+      const response = await fetch("/api/extract", {
+        method: "POST",
+        body: formData,
+      });
 
-        setResults(mockResults);
-        setIsExtracting(false);
-      }, 1500);
+      if (!response.ok) {
+        throw new Error(`API request failed with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // 更新结果
+      setResults(data.results);
+
+      // 更新加载状态为成功
+      toast.success(
+        `Successfully extracted data from ${selectedImages.length} image${
+          selectedImages.length > 1 ? "s" : ""
+        }.`,
+        {
+          id: toastId,
+          description: "You can now view and edit the results.",
+        }
+      );
     } catch (error) {
       console.error("Extraction error:", error);
+
+      // 更新加载状态为失败
+      toast.error("Failed to extract data", {
+        id: toastId,
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
       setIsExtracting(false);
     }
   };
@@ -233,6 +254,10 @@ export function FormImagesProcessor() {
   // Handle updating results after editing
   const handleUpdateResults = (updatedResults: ExtractionResult[]) => {
     setResults(updatedResults);
+
+    toast.success("Results updated", {
+      description: "Your changes to the extracted data have been saved.",
+    });
   };
 
   // The loading state when templates are being fetched
@@ -439,7 +464,16 @@ export function FormImagesProcessor() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Extracted Results</CardTitle>
           {results.length > 0 && (
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                toast.success("Changes saved", {
+                  description:
+                    "Your changes to the extracted data have been saved.",
+                });
+              }}
+            >
               <Save className="h-4 w-4 mr-2" />
               Save Changes
             </Button>
@@ -490,6 +524,9 @@ export function FormImagesProcessor() {
         onClose={() => setShowTemplateSelectionDialog(false)}
         onSelectTemplate={(template) => {
           selectTemplate(template.id);
+          toast.info(`Template selected: ${template.name}`, {
+            description: `${template.fields.length} fields will be used for extraction.`,
+          });
         }}
         onCreateTemplate={handleCreateTemplate}
         currentTemplateId={selectedTemplate?.id}
