@@ -1,5 +1,5 @@
 // app/dashboard/page.tsx
-import { FormProcessor } from "@/components/dashboard/form-processor";
+import { FormImagesProcessor } from "@/components/dashboard/form-images-processor";
 
 export default function DashboardPage() {
   return (
@@ -13,7 +13,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <FormProcessor />
+      <FormImagesProcessor />
     </div>
   );
 }
