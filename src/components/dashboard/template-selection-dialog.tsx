@@ -11,25 +11,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings, Wand2, Plus, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { FileText, Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface ExtractionDialogProps {
+interface TemplateSelectionDialogProps {
   open: boolean;
   onClose: () => void;
   onSelectTemplate: (template: Template) => void;
-  onCreateTemplate: () => void;
-  selectedCount: number;
+  onCreateTemplate?: () => void;
+  currentTemplateId?: string | null;
 }
 
-export function ExtractionDialog({
+export function TemplateSelectionDialog({
   open,
   onClose,
   onSelectTemplate,
   onCreateTemplate,
-  selectedCount,
-}: ExtractionDialogProps) {
+  currentTemplateId = null,
+}: TemplateSelectionDialogProps) {
   const router = useRouter();
   const { templates, isLoading, error } = useTemplates();
 
@@ -37,10 +36,9 @@ export function ExtractionDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Extract Data from Images</DialogTitle>
+          <DialogTitle>Select Template</DialogTitle>
           <DialogDescription>
-            Choose a template to extract data from {selectedCount} selected
-            image{selectedCount !== 1 ? "s" : ""}.
+            Choose a template to use for extraction
           </DialogDescription>
         </DialogHeader>
 
@@ -64,20 +62,40 @@ export function ExtractionDialog({
           ) : templates.length === 0 ? (
             <div className="text-center p-6">
               <p className="text-gray-500 mb-4">No templates found</p>
-              <Button onClick={onCreateTemplate}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Template
-              </Button>
+              {onCreateTemplate && (
+                <Button
+                  onClick={() => {
+                    onClose();
+                    onCreateTemplate();
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Template
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {templates.map((template) => (
                 <button
                   key={template.id}
-                  onClick={() => onSelectTemplate(template)}
-                  className="flex items-start gap-4 p-4 rounded-lg border hover:border-primary transition-colors hover:bg-primary/5 w-full text-left"
+                  onClick={() => {
+                    onSelectTemplate(template);
+                    onClose();
+                  }}
+                  className={`flex items-start gap-4 p-4 rounded-lg border hover:border-primary transition-colors hover:bg-primary/5 w-full text-left ${
+                    template.id === currentTemplateId
+                      ? "border-primary bg-primary/5"
+                      : ""
+                  }`}
                 >
-                  <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
+                  <div
+                    className={`p-2 rounded-full ${
+                      template.id === currentTemplateId
+                        ? "bg-primary text-white"
+                        : "bg-primary/10 text-primary"
+                    } shrink-0`}
+                  >
                     <FileText className="h-5 w-5" />
                   </div>
                   <div>
@@ -94,21 +112,26 @@ export function ExtractionDialog({
                 </button>
               ))}
 
-              <button
-                onClick={onCreateTemplate}
-                className="flex items-start gap-4 p-4 rounded-lg border border-dashed hover:border-primary transition-colors hover:bg-primary/5 w-full text-left"
-              >
-                <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
-                  <Plus className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Create New Template</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Define specific fields to extract based on your
-                    requirements.
-                  </p>
-                </div>
-              </button>
+              {onCreateTemplate && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onCreateTemplate();
+                  }}
+                  className="flex items-start gap-4 p-4 rounded-lg border border-dashed hover:border-primary transition-colors hover:bg-primary/5 w-full text-left"
+                >
+                  <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
+                    <Plus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Create New Template</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Define specific fields to extract based on your
+                      requirements.
+                    </p>
+                  </div>
+                </button>
+              )}
             </div>
           )}
         </div>

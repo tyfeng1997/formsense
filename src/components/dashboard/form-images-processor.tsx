@@ -13,19 +13,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ExtractionDialog } from "./extraction-dialog";
 import { ExtractedResults } from "./extracted-results";
-import { TemplateSelector } from "./template-selector";
+import { useTemplates } from "@/components/template/template-context";
+import { Template } from "@/lib/template-storage";
+import { TemplateSelectionDialog } from "./template-selection-dialog";
 
 type FormImage = {
   id: string;
@@ -40,61 +33,27 @@ type ExtractionResult = {
   fields: Record<string, string>;
 };
 
-type Template = {
-  id: string;
-  name: string;
-  fields: { name: string; description?: string }[];
-};
-
 export function FormImagesProcessor() {
   const router = useRouter();
+  const {
+    templates,
+    selectedTemplate,
+    selectTemplate,
+    isLoading: isLoadingTemplates,
+  } = useTemplates();
+
   const [images, setImages] = useState<FormImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [showExtractionDialog, setShowExtractionDialog] = useState(false);
+  const [showTemplateSelectionDialog, setShowTemplateSelectionDialog] =
+    useState(false);
   const [results, setResults] = useState<ExtractionResult[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
-  const [templates, setTemplates] = useState<Template[]>([
-    {
-      id: "invoice-template",
-      name: "Invoice Template",
-      fields: [
-        { name: "Invoice Number", description: "Usually top right" },
-        { name: "Date", description: "Invoice date" },
-        { name: "Total Amount", description: "Final total with tax" },
-        { name: "Vendor", description: "Company name" },
-      ],
-    },
-    {
-      id: "receipt-template",
-      name: "Receipt Template",
-      fields: [
-        { name: "Store Name", description: "Business name" },
-        { name: "Purchase Date", description: "Date of purchase" },
-        { name: "Items", description: "List of items" },
-        { name: "Total", description: "Total price" },
-        { name: "Payment Method", description: "How it was paid" },
-      ],
-    },
-    {
-      id: "business-card",
-      name: "Business Card Template",
-      fields: [
-        { name: "Name", description: "Person's name" },
-        { name: "Title", description: "Job title" },
-        { name: "Company", description: "Company name" },
-        { name: "Email", description: "Email address" },
-        { name: "Phone", description: "Phone number" },
-      ],
-    },
-  ]);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
-    null
-  );
 
   // Calculate selected images count
   const selectedImagesCount = images.filter((img) => img.selected).length;
 
-  // Reset results when template changes
+  // Reset results when selected template changes
   useEffect(() => {
     if (results.length > 0) {
       setResults([]);
@@ -156,11 +115,11 @@ export function FormImagesProcessor() {
   };
 
   const handleExtractClick = () => {
+    // Open extraction dialog if no template is selected
     if (!selectedTemplate) {
-      // No template selected yet, open template selection
       setShowExtractionDialog(true);
     } else {
-      // Template already selected, proceed with extraction using that template
+      // Use the already selected template
       handleExtractWithTemplate(selectedTemplate);
     }
   };
@@ -175,7 +134,7 @@ export function FormImagesProcessor() {
 
       // Set the selected template if not already set
       if (!selectedTemplate || selectedTemplate.id !== template.id) {
-        setSelectedTemplate(template);
+        selectTemplate(template.id);
       }
 
       // Mock extraction based on template fields
@@ -186,53 +145,67 @@ export function FormImagesProcessor() {
 
           template.fields.forEach((field) => {
             // Generate appropriate mock data based on field name
-            switch (field.name.toLowerCase()) {
-              case "invoice number":
-                fields[field.name] = "INV-" + Math.floor(Math.random() * 10000);
-                break;
-              case "date":
-              case "purchase date":
-                fields[field.name] =
-                  "2023-" +
-                  (Math.floor(Math.random() * 12) + 1) +
-                  "-" +
-                  (Math.floor(Math.random() * 28) + 1);
-                break;
-              case "total":
-              case "total amount":
-                fields[field.name] = "$" + (Math.random() * 1000).toFixed(2);
-                break;
-              case "vendor":
-              case "store name":
-              case "company":
-                fields[field.name] = "TEST COMPANY";
-                break;
-              case "payment method":
-                const methods = ["CREDIT CARD", "CASH", "DEBIT", "PAYPAL"];
-                fields[field.name] =
-                  methods[Math.floor(Math.random() * methods.length)];
-                break;
-              case "email":
-                fields[field.name] = "test@example.com";
-                break;
-              case "phone":
-                fields[field.name] =
-                  "+1 (555) 123-" +
-                  Math.floor(Math.random() * 10000)
-                    .toString()
-                    .padStart(4, "0");
-                break;
-              case "name":
-                fields[field.name] = "John Doe";
-                break;
-              case "title":
-                fields[field.name] = "Product Manager";
-                break;
-              case "items":
-                fields[field.name] = "Item 1, Item 2, Item 3";
-                break;
-              default:
-                fields[field.name] = "TEST DATA";
+            const fieldNameLower = field.name.toLowerCase();
+
+            if (
+              fieldNameLower.includes("invoice") ||
+              fieldNameLower.includes("number")
+            ) {
+              fields[field.name] = "INV-" + Math.floor(Math.random() * 10000);
+            } else if (
+              fieldNameLower.includes("date") ||
+              fieldNameLower.includes("purchase")
+            ) {
+              fields[field.name] =
+                "2023-" +
+                (Math.floor(Math.random() * 12) + 1) +
+                "-" +
+                (Math.floor(Math.random() * 28) + 1);
+            } else if (
+              fieldNameLower.includes("total") ||
+              fieldNameLower.includes("amount") ||
+              fieldNameLower.includes("price")
+            ) {
+              fields[field.name] = "$" + (Math.random() * 1000).toFixed(2);
+            } else if (
+              fieldNameLower.includes("vendor") ||
+              fieldNameLower.includes("store") ||
+              fieldNameLower.includes("company")
+            ) {
+              fields[field.name] = "TEST COMPANY";
+            } else if (
+              fieldNameLower.includes("payment") ||
+              fieldNameLower.includes("method")
+            ) {
+              const methods = ["CREDIT CARD", "CASH", "DEBIT", "PAYPAL"];
+              fields[field.name] =
+                methods[Math.floor(Math.random() * methods.length)];
+            } else if (fieldNameLower.includes("email")) {
+              fields[field.name] = "test@example.com";
+            } else if (fieldNameLower.includes("phone")) {
+              fields[field.name] =
+                "+1 (555) 123-" +
+                Math.floor(Math.random() * 10000)
+                  .toString()
+                  .padStart(4, "0");
+            } else if (
+              fieldNameLower.includes("name") &&
+              !fieldNameLower.includes("company") &&
+              !fieldNameLower.includes("store")
+            ) {
+              fields[field.name] = "John Doe";
+            } else if (
+              fieldNameLower.includes("title") ||
+              fieldNameLower.includes("position")
+            ) {
+              fields[field.name] = "Product Manager";
+            } else if (
+              fieldNameLower.includes("items") ||
+              fieldNameLower.includes("products")
+            ) {
+              fields[field.name] = "Item 1, Item 2, Item 3";
+            } else {
+              fields[field.name] = "TEST DATA";
             }
           });
 
@@ -253,8 +226,6 @@ export function FormImagesProcessor() {
   };
 
   const handleCreateTemplate = () => {
-    // Close the dialog
-    setShowExtractionDialog(false);
     // Navigate to templates page with a query parameter to trigger template creation
     router.push("/dashboard/templates?create=true");
   };
@@ -264,11 +235,17 @@ export function FormImagesProcessor() {
     setResults(updatedResults);
   };
 
-  // Function to add a new template
-  const handleAddTemplate = (newTemplate: Template) => {
-    setTemplates((prev) => [...prev, newTemplate]);
-    setSelectedTemplate(newTemplate);
-  };
+  // The loading state when templates are being fetched
+  if (isLoadingTemplates) {
+    return (
+      <div className="flex justify-center items-center p-12">
+        <div className="animate-spin mr-2">
+          <FileText className="h-6 w-6 text-primary" />
+        </div>
+        <p>Loading templates...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -406,12 +383,53 @@ export function FormImagesProcessor() {
             <CardTitle>Extraction Template</CardTitle>
           </CardHeader>
           <CardContent>
-            <TemplateSelector
-              templates={templates}
-              selectedTemplate={selectedTemplate}
-              onSelectTemplate={setSelectedTemplate}
-              onAddTemplate={handleAddTemplate}
-            />
+            {selectedTemplate ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-md bg-primary/10 text-primary">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-medium">{selectedTemplate.name}</h3>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowTemplateSelectionDialog(true)}
+                  >
+                    Change Template
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {selectedTemplate.fields.map((field) => (
+                    <div
+                      key={field.id}
+                      className="border bg-gray-50 p-2 rounded"
+                    >
+                      <p className="font-medium text-sm">{field.name}</p>
+                      {field.description && (
+                        <p className="text-xs text-gray-500">
+                          {field.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <p className="text-gray-500">No template selected</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowTemplateSelectionDialog(true)}
+                >
+                  Select Template
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -458,69 +476,24 @@ export function FormImagesProcessor() {
       </Card>
 
       {/* Extraction Dialog for template selection */}
-      <Dialog
+      <TemplateSelectionDialog
         open={showExtractionDialog}
-        onOpenChange={setShowExtractionDialog}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Select Extraction Template</DialogTitle>
-            <DialogDescription>
-              Choose a template to extract data from {selectedImagesCount}{" "}
-              selected image{selectedImagesCount !== 1 ? "s" : ""}.
-            </DialogDescription>
-          </DialogHeader>
+        onClose={() => setShowExtractionDialog(false)}
+        onSelectTemplate={handleExtractWithTemplate}
+        onCreateTemplate={handleCreateTemplate}
+        currentTemplateId={selectedTemplate?.id}
+      />
 
-          <div className="grid grid-cols-1 gap-4 py-4">
-            {templates.map((template) => (
-              <button
-                key={template.id}
-                onClick={() => handleExtractWithTemplate(template)}
-                className="flex items-start gap-4 p-4 rounded-lg border hover:border-primary transition-colors hover:bg-primary/5"
-              >
-                <div className="p-2 rounded-full bg-primary/10 text-primary">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-medium">{template.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {template.fields.length} fields including:{" "}
-                    {template.fields
-                      .slice(0, 2)
-                      .map((f) => f.name)
-                      .join(", ")}
-                    {template.fields.length > 2 ? "..." : ""}
-                  </p>
-                </div>
-              </button>
-            ))}
-
-            <button
-              onClick={handleCreateTemplate}
-              className="flex items-start gap-4 p-4 rounded-lg border border-dashed hover:border-primary transition-colors hover:bg-primary/5"
-            >
-              <div className="p-2 rounded-full bg-primary/10 text-primary">
-                <Plus className="h-5 w-5" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-medium">Create New Template</h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Define specific fields to extract based on your requirements.
-                </p>
-              </div>
-            </button>
-          </div>
-
-          <DialogFooter className="sm:justify-start">
-            <Button
-              variant="outline"
-              onClick={() => setShowExtractionDialog(false)}
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Template Change Dialog */}
+      <TemplateSelectionDialog
+        open={showTemplateSelectionDialog}
+        onClose={() => setShowTemplateSelectionDialog(false)}
+        onSelectTemplate={(template) => {
+          selectTemplate(template.id);
+        }}
+        onCreateTemplate={handleCreateTemplate}
+        currentTemplateId={selectedTemplate?.id}
+      />
     </div>
   );
 }
