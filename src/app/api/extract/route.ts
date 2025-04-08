@@ -1,12 +1,18 @@
 // app/api/extract/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import Anthropic from "@anthropic-ai/sdk";
+
+// Initialize Anthropic client
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "",
+});
 
 export async function POST(request: NextRequest) {
   try {
-    // 使用 FormData 获取文件和其他数据
+    // Use FormData to get files and other data
     const formData = await request.formData();
 
-    // 获取模板数据
+    // Get template data
     const templateJson = formData.get("template") as string;
     let template;
 
@@ -20,65 +26,141 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取图像文件
-    const imageFiles: File[] = [];
-    const imageIds: string[] = [];
+    // Collect all image files and IDs
+    const imageEntries: Array<{ id: string; file: File; name: string }> = [];
 
-    // 收集所有图像文件和ID
+    // Collect all image files and ID
     for (const [key, value] of formData.entries()) {
       if (key.startsWith("image_") && value instanceof File) {
-        imageFiles.push(value);
-        // 提取image_<id>格式中的id部分
-        const imageId = key.substring(6); // 去除'image_'前缀
-        imageIds.push(imageId);
+        // Extract the image ID from the key (remove 'image_' prefix)
+        const imageId = key.substring(6);
+        imageEntries.push({
+          id: imageId,
+          file: value as File,
+          name: (value as File).name,
+        });
       }
     }
 
-    // 打印接收到的元数据（用于调试）
-    console.log("Template:", {
-      id: template.id,
-      name: template.name,
-      fields: template.fields.map((f: any) => f.name),
-    });
+    if (imageEntries.length === 0) {
+      return NextResponse.json(
+        { error: "No images provided" },
+        { status: 400 }
+      );
+    }
 
-    console.log(
-      "Images:",
-      imageFiles.map((file) => ({
-        name: file.name,
-        type: file.type,
-        size: `${(file.size / 1024).toFixed(2)} KB`,
-      }))
-    );
+    // Process each image sequentially to avoid overwhelming the API
+    const results = [];
 
-    // 在实际场景中，这里会处理图像并提取数据
-    // 现在我们只是返回模拟结果
+    for (const entry of imageEntries) {
+      // Convert the image to base64
+      const arrayBuffer = await entry.file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64Image = buffer.toString("base64");
 
-    // 创建结果，使用模板字段
-    const mockResults = imageIds.map((imageId, index) => {
-      const imageFile = imageFiles[index];
+      // Prepare prompt for Claude based on the template
+      const fieldPrompts = template.fields
+        .map(
+          (field: any) =>
+            `${field.name}: ${field.description || "Extract this value"}`
+        )
+        .join("\n");
 
-      // 为模板中的每个字段创建一个结果
-      const fields: Record<string, string> = {};
-      template.fields.forEach((field: any) => {
-        fields[field.name] = `TEST PASS - ${field.name}`;
-      });
+      // Create the prompt for Claude
+      const prompt = `Please extract the following fields from this form/receipt image:
+      
+${fieldPrompts}
 
-      return {
-        imageId,
-        imageName: imageFile.name,
-        fields,
-        // 添加一些元数据，仅用于演示
-        metadata: {
-          fileSize: imageFile.size,
-          fileType: imageFile.type,
-        },
-      };
-    });
+Return ONLY a JSON object with these field names as keys and the extracted values as values. 
+If you can't find a value, use an empty string.`;
 
-    // 模拟处理时间
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Call Claude API
+      try {
+        const response = await anthropic.messages.create({
+          model: "claude-3-7-sonnet-20250219",
+          max_tokens: 1024,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "image",
+                  source: {
+                    type: "base64",
+                    media_type: determineMediaType(entry.file.type),
+                    data: base64Image,
+                  },
+                },
+                {
+                  type: "text",
+                  text: prompt,
+                },
+              ],
+            },
+          ],
+        });
 
-    return NextResponse.json({ results: mockResults });
+        // Parse the response from Claude
+        const responseText = response.content[0].text;
+        let extractedFields: Record<string, string> = {};
+
+        try {
+          // Try to parse the JSON response
+          const jsonMatch =
+            responseText.match(/```json\n([\s\S]*?)\n```/) ||
+            responseText.match(/```\n([\s\S]*?)\n```/) ||
+            responseText.match(/{[\s\S]*?}/);
+
+          if (jsonMatch) {
+            extractedFields = JSON.parse(
+              jsonMatch[0].replace(/```json\n|```\n|```/g, "")
+            );
+          } else {
+            // If JSON parsing fails, try to extract key-value pairs directly
+            extractedFields = parseFieldsFromText(
+              responseText,
+              template.fields
+            );
+          }
+        } catch (error) {
+          console.error("Failed to parse Claude's response:", error);
+          // Fallback to parsing text directly
+          extractedFields = parseFieldsFromText(responseText, template.fields);
+        }
+
+        // Add the result
+        results.push({
+          imageId: entry.id,
+          imageName: entry.name,
+          fields: extractedFields,
+          metadata: {
+            fileSize: entry.file.size,
+            fileType: entry.file.type,
+          },
+        });
+      } catch (error) {
+        console.error(`Error processing image ${entry.name}:`, error);
+        // Add a failed result
+        results.push({
+          imageId: entry.id,
+          imageName: entry.name,
+          fields: template.fields.reduce(
+            (acc: Record<string, string>, field: any) => {
+              acc[field.name] = `Error: Failed to extract`;
+              return acc;
+            },
+            {}
+          ),
+          error: "Failed to process image",
+          metadata: {
+            fileSize: entry.file.size,
+            fileType: entry.file.type,
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ results });
   } catch (error) {
     console.error("Extract API error:", error);
     return NextResponse.json(
@@ -88,11 +170,50 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 增加最大请求体大小
+// Helper function to determine media type for the API
+function determineMediaType(fileType: string): string {
+  switch (fileType.toLowerCase()) {
+    case "image/jpeg":
+    case "image/jpg":
+      return "image/jpeg";
+    case "image/png":
+      return "image/png";
+    default:
+      return "image/jpeg"; // Default to JPEG
+  }
+}
+
+// Parse fields from text response if JSON parsing fails
+function parseFieldsFromText(
+  text: string,
+  templateFields: any[]
+): Record<string, string> {
+  const result: Record<string, string> = {};
+
+  // Initialize with empty values
+  templateFields.forEach((field) => {
+    result[field.name] = "";
+  });
+
+  // Try to extract values for each field
+  templateFields.forEach((field) => {
+    const fieldName = field.name;
+    const regex = new RegExp(`${fieldName}[\\s:]+([^\\n]+)`, "i");
+    const match = text.match(regex);
+
+    if (match && match[1]) {
+      result[fieldName] = match[1].trim();
+    }
+  });
+
+  return result;
+}
+
+// Increase max request body size (handled by server config)
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "20mb", // 设置适当的大小限制
+      sizeLimit: "20mb",
     },
   },
 };

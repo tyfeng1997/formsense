@@ -20,12 +20,13 @@ import { useTemplates } from "@/components/template/template-context";
 import { Template } from "@/lib/template-storage";
 import { TemplateSelectionDialog } from "./template-selection-dialog";
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 type FormImage = {
   id: string;
   name: string;
   url: string;
-  file: File; // 存储原始文件对象
+  file: File; // Store original file object
   selected: boolean;
 };
 
@@ -37,6 +38,7 @@ type ExtractionResult = {
     fileSize: number;
     fileType: string;
   };
+  error?: string;
 };
 
 export function FormImagesProcessor() {
@@ -56,6 +58,11 @@ export function FormImagesProcessor() {
     useState(false);
   const [results, setResults] = useState<ExtractionResult[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
+
+  // Progress tracking for batch processing
+  const [processedCount, setProcessedCount] = useState(0);
+  const [totalToProcess, setTotalToProcess] = useState(0);
+  const [extractionProgress, setExtractionProgress] = useState(0);
 
   // Calculate selected images count
   const selectedImagesCount = images.filter((img) => img.selected).length;
@@ -93,11 +100,14 @@ export function FormImagesProcessor() {
 
   const processFiles = (files: File[]) => {
     // Only process image files
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const imageFiles = files.filter(
+      (file) =>
+        file.type.startsWith("image/jpeg") || file.type.startsWith("image/jpg")
+    );
 
     if (imageFiles.length === 0) {
       toast.error("No valid image files found", {
-        description: "Please upload JPG, PNG, JPEG, or WEBP files.",
+        description: "Currently, only JPG/JPEG files are supported.",
       });
       return;
     }
@@ -110,7 +120,7 @@ export function FormImagesProcessor() {
         id,
         name: file.name,
         url: URL.createObjectURL(file),
-        file, // 保存文件对象
+        file, // Save file object
         selected: false,
       };
     });
@@ -126,7 +136,7 @@ export function FormImagesProcessor() {
   };
 
   const handleRemoveImage = (imageId: string) => {
-    // 释放URL对象
+    // Release URL object
     const imageToRemove = images.find((img) => img.id === imageId);
     if (imageToRemove) {
       URL.revokeObjectURL(imageToRemove.url);
@@ -178,7 +188,13 @@ export function FormImagesProcessor() {
     setIsExtracting(true);
     setShowExtractionDialog(false);
 
-    // 显示提取中的加载状态
+    // Reset progress tracking
+    setProcessedCount(0);
+    setTotalToProcess(selectedImages.length);
+    setExtractionProgress(0);
+    setResults([]);
+
+    // Show loading toast
     const toastId = toast.loading(
       `Extracting data from ${selectedImages.length} image${
         selectedImages.length > 1 ? "s" : ""
@@ -191,38 +207,69 @@ export function FormImagesProcessor() {
         selectTemplate(template.id);
       }
 
-      // 准备 FormData
-      const formData = new FormData();
+      // Process images one by one to show progress
+      const newResults: ExtractionResult[] = [];
 
-      // 添加模板数据
-      formData.append("template", JSON.stringify(template));
+      for (let i = 0; i < selectedImages.length; i++) {
+        const image = selectedImages[i];
 
-      // 添加所有选定的图像文件
-      selectedImages.forEach((image) => {
-        // 使用格式 'image_<id>' 来标识每个图像
+        // Create FormData for this single image
+        const formData = new FormData();
+        formData.append("template", JSON.stringify(template));
         formData.append(`image_${image.id}`, image.file);
-      });
 
-      // 发送提取请求
-      const response = await fetch("/api/extract", {
-        method: "POST",
-        body: formData,
-      });
+        try {
+          // Send extraction request for this single image
+          const response = await fetch("/api/extract", {
+            method: "POST",
+            body: formData,
+          });
 
-      if (!response.ok) {
-        throw new Error(`API request failed with status: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(
+              `API request failed with status: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          // Add the result to our collection
+          if (data.results && data.results.length > 0) {
+            newResults.push(data.results[0]);
+          }
+        } catch (error) {
+          console.error(`Error processing image ${image.name}:`, error);
+
+          // Add a failed result
+          newResults.push({
+            imageId: image.id,
+            imageName: image.name,
+            fields: template.fields.reduce(
+              (acc: Record<string, string>, field: any) => {
+                acc[field.name] = `Error: Failed to extract`;
+                return acc;
+              },
+              {}
+            ),
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
+        }
+
+        // Update progress
+        setProcessedCount(i + 1);
+        setExtractionProgress(
+          Math.round(((i + 1) / selectedImages.length) * 100)
+        );
+
+        // Update results as they come in
+        setResults([...newResults]);
       }
 
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      // 更新结果
-      setResults(data.results);
-
-      // 更新加载状态为成功
+      // Success toast
       toast.success(
         `Successfully extracted data from ${selectedImages.length} image${
           selectedImages.length > 1 ? "s" : ""
@@ -235,7 +282,7 @@ export function FormImagesProcessor() {
     } catch (error) {
       console.error("Extraction error:", error);
 
-      // 更新加载状态为失败
+      // Update loading status to failed
       toast.error("Failed to extract data", {
         id: toastId,
         description:
@@ -297,7 +344,7 @@ export function FormImagesProcessor() {
               type="file"
               className="hidden"
               multiple
-              accept="image/*"
+              accept="image/jpeg,image/jpg"
               onChange={handleFileChange}
             />
             <div className="flex flex-col items-center justify-center gap-2">
@@ -306,7 +353,7 @@ export function FormImagesProcessor() {
                 Drag and drop image files or click to browse
               </p>
               <p className="text-sm text-gray-500">
-                Supported formats: JPG, PNG, JPEG, WEBP
+                Currently supported format: JPG/JPEG
               </p>
             </div>
           </div>
@@ -335,7 +382,7 @@ export function FormImagesProcessor() {
                   <Button
                     size="sm"
                     onClick={handleExtractClick}
-                    disabled={selectedImagesCount === 0}
+                    disabled={selectedImagesCount === 0 || isExtracting}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Extract ({selectedImagesCount})
@@ -481,7 +528,7 @@ export function FormImagesProcessor() {
         </CardHeader>
         <CardContent>
           {isExtracting ? (
-            <div className="flex items-center justify-center py-10">
+            <div className="flex flex-col items-center justify-center py-10 space-y-4">
               <div className="flex flex-col items-center gap-2">
                 <div className="animate-spin">
                   <FileText className="h-8 w-8 text-primary" />
@@ -490,6 +537,29 @@ export function FormImagesProcessor() {
                   Extracting data from selected images...
                 </p>
               </div>
+
+              {/* Progress tracking */}
+              <div className="w-full max-w-md space-y-2">
+                <Progress value={extractionProgress} className="h-2" />
+                <p className="text-xs text-center text-gray-500">
+                  Processing image {processedCount} of {totalToProcess}
+                  {processedCount > 0 &&
+                    results.length > 0 &&
+                    " (Results updated as they arrive)"}
+                </p>
+              </div>
+
+              {/* Display partial results while processing */}
+              {results.length > 0 && (
+                <div className="w-full mt-4">
+                  <p className="text-sm font-medium mb-2">Partial Results</p>
+                  <ExtractedResults
+                    results={results}
+                    template={selectedTemplate}
+                    onUpdateResults={handleUpdateResults}
+                  />
+                </div>
+              )}
             </div>
           ) : results.length > 0 ? (
             <ExtractedResults
