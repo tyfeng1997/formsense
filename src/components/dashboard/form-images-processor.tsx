@@ -98,41 +98,78 @@ export function FormImagesProcessor() {
     }
   };
 
-  const processFiles = (files: File[]) => {
+  const processFiles = async (files: File[]) => {
     // Only process image files
-    const imageFiles = files.filter(
-      (file) =>
-        file.type.startsWith("image/jpeg") || file.type.startsWith("image/jpg")
-    );
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
     if (imageFiles.length === 0) {
       toast.error("No valid image files found", {
-        description: "Currently, only JPG/JPEG files are supported.",
+        description: "Please upload image files.",
       });
       return;
     }
 
-    const newImages: FormImage[] = imageFiles.map((file) => {
-      const id = `image-${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(2, 9)}`;
-      return {
-        id,
-        name: file.name,
-        url: URL.createObjectURL(file),
-        file, // Save file object
-        selected: false,
-      };
-    });
-
-    setImages((prev) => [...prev, ...newImages]);
-
-    toast.success(
-      `${imageFiles.length} image${imageFiles.length > 1 ? "s" : ""} uploaded`,
-      {
-        description: "Select images and a template to extract data.",
-      }
+    // Show loading toast for conversion
+    const conversionToastId = toast.loading(
+      `Converting ${imageFiles.length} image${
+        imageFiles.length > 1 ? "s" : ""
+      } to JPEG format...`
     );
+
+    try {
+      // Import the conversion functions dynamically
+      const { batchConvertToJpeg } = await import("@/lib/image-utils");
+
+      // Check for WeChat images
+      const hasWeChatImages = imageFiles.some(
+        (file) =>
+          file.name.toLowerCase().includes("wechat") ||
+          file.name.toLowerCase().includes("微信")
+      );
+
+      if (hasWeChatImages) {
+        toast.info("WeChat images detected", {
+          description:
+            "WeChat images will be specially processed for compatibility.",
+        });
+      }
+
+      // Convert all images to JPEG
+      const convertedFiles = await batchConvertToJpeg(imageFiles, 0.92);
+
+      const newImages: FormImage[] = convertedFiles.map((file, index) => {
+        const id = `image-${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 9)}`;
+        return {
+          id,
+          name: file.name, // This will have .jpg extension now
+          url: URL.createObjectURL(file),
+          file, // Save the converted file object
+          selected: false,
+        };
+      });
+
+      setImages((prev) => [...prev, ...newImages]);
+
+      toast.success(
+        `${imageFiles.length} image${
+          imageFiles.length > 1 ? "s" : ""
+        } uploaded`,
+        {
+          id: conversionToastId,
+          description:
+            "All images converted to JPEG format. Select images and a template to extract data.",
+        }
+      );
+    } catch (error) {
+      console.error("Image conversion error:", error);
+      toast.error("Failed to convert images", {
+        id: conversionToastId,
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    }
   };
 
   const handleRemoveImage = (imageId: string) => {
@@ -344,7 +381,7 @@ export function FormImagesProcessor() {
               type="file"
               className="hidden"
               multiple
-              accept="image/jpeg,image/jpg"
+              accept="image/*"
               onChange={handleFileChange}
             />
             <div className="flex flex-col items-center justify-center gap-2">
@@ -353,7 +390,8 @@ export function FormImagesProcessor() {
                 Drag and drop image files or click to browse
               </p>
               <p className="text-sm text-gray-500">
-                Currently supported format: JPG/JPEG
+                Supported formats: PNG, JPG, JPEG, GIF, WEBP, etc. (all will be
+                converted to JPEG)
               </p>
             </div>
           </div>
