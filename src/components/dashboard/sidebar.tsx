@@ -1,18 +1,47 @@
+// components/dashboard/sidebar.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { FileImage, FileJson, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  FileImage,
+  FileJson,
+  Menu,
+  X,
+  LogOut,
+  User as UserIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { AuthModal } from "@/components/auth/auth-modal";
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-export function Sidebar() {
+interface SidebarProps {
+  user?: User;
+}
+
+export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh();
   };
 
   const NavItem = ({
@@ -41,6 +70,13 @@ export function Sidebar() {
         <span>{label}</span>
       </Link>
     );
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user?.email) return "U";
+    const email = user.email;
+    return email.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -99,7 +135,44 @@ export function Sidebar() {
           />
         </nav>
 
-        <div className="border-t pt-4 mt-auto">
+        <div className="border-t pt-4 mt-auto space-y-4">
+          {/* User profile and authentication */}
+          {user ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                </Avatar>
+                <div className="text-sm">
+                  <p
+                    className="font-medium truncate w-32"
+                    title={user.email || ""}
+                  >
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <UserIcon className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <AuthModal />
+          )}
+
           <div className="text-xs text-gray-500">
             <p>FormSense App v1.0.0</p>
           </div>
