@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FormImagesProcessor } from "@/components/dashboard/form-images-processor";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -13,6 +14,7 @@ interface DashboardClientProps {
 
 export function DashboardClient({ isLoggedIn }: DashboardClientProps) {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const searchParams = useSearchParams();
 
   // Automatically show the auth modal when the component mounts if the user is not logged in
   useEffect(() => {

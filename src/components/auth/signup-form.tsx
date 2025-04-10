@@ -40,7 +40,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/dashboard`,
         },
       });
 
@@ -48,12 +48,13 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         throw error;
       }
 
-      setSuccessMessage("Check your email for the confirmation link");
-      router.refresh();
+      setSuccessMessage(
+        "Please check your email for the confirmation link to activate your account and start your free trial!"
+      );
       // We don't close the modal immediately on signup as we want to show the success message
       setTimeout(() => {
         onSuccess();
-      }, 3000);
+      }, 5000);
     } catch (err: any) {
       setError(err.message || "Failed to sign up");
     } finally {

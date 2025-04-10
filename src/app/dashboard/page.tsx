@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { FormImagesProcessor } from "@/components/dashboard/form-images-processor";
 import { AuthModalWrapper } from "@/components/auth/auth-modal-wrapper";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
+import { WelcomeModal } from "@/components/dashboard/welcome-modal";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -34,6 +35,9 @@ export default async function DashboardPage() {
       </div>
 
       <DashboardClient isLoggedIn={!!user} />
+
+      {/* Add the welcome modal component - it will only show when welcome=new param is present */}
+      <WelcomeModal />
     </div>
   );
 }
