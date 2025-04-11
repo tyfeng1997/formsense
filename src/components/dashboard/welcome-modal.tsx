@@ -42,16 +42,16 @@ export function WelcomeModal() {
 
         <div className="py-4">
           <h3 className="font-semibold text-lg mb-2">
-            Your Free Trial Starts Now
+            Early Access to Our MVP
           </h3>
           <p className="mb-3">
-            You now have access to all premium features of FormSense for the
-            next 14 days:
+            As an early adopter, you have unlimited access to all FormSense
+            features during our MVP development phase:
           </p>
           <ul className="space-y-2 ml-2">
             <li className="flex items-start gap-2">
               <span className="text-green-500 font-bold mt-0.5">✓</span>
-              <span>Upload and process unlimited form images</span>
+              <span>Process unlimited documents</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-500 font-bold mt-0.5">✓</span>
@@ -63,7 +63,7 @@ export function WelcomeModal() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-500 font-bold mt-0.5">✓</span>
-              <span>Priority support</span>
+              <span>Help shape our product with your feedback</span>
             </li>
           </ul>
         </div>
@@ -72,7 +72,7 @@ export function WelcomeModal() {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Maybe Later
           </Button>
-          <Button onClick={() => setOpen(false)}>Start Free Trial</Button>
+          <Button onClick={() => setOpen(false)}>Start Using FormSense</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
