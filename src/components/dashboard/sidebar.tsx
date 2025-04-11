@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { AuthModal } from "@/components/auth/auth-modal";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -136,45 +135,40 @@ export function Sidebar({ user }: SidebarProps) {
         </nav>
 
         <div className="border-t pt-4 mt-auto space-y-4">
-          {/* User profile and authentication */}
-          {user ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{getUserInitials()}</AvatarFallback>
-                </Avatar>
-                <div className="text-sm">
-                  <p
-                    className="font-medium truncate w-32"
-                    title={user.email || ""}
-                  >
-                    {user.email}
-                  </p>
-                </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>{getUserInitials()}</AvatarFallback>
+              </Avatar>
+              <div className="text-sm">
+                <p
+                  className="font-medium truncate w-32"
+                  title={user?.email || ""}
+                >
+                  {user?.email}
+                </p>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost">
-                    <UserIcon className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="cursor-pointer"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
-          ) : (
-            <AuthModal />
-          )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost">
+                  <UserIcon className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="cursor-pointer"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <div className="text-xs text-gray-500">
-            <p>FormSense App v1.0.0</p>
+            <p>FormSense Alpha Version</p>
           </div>
         </div>
       </aside>
