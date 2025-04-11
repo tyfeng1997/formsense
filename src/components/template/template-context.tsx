@@ -7,7 +7,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { TemplateStorage, Template, Field } from "@/lib/template-storage";
+import { Template, Field } from "@/lib/template-supabase";
 
 interface TemplateContextType {
   templates: Template[];
@@ -44,24 +44,32 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     refreshTemplates();
   }, []);
 
-  // Refresh templates from storage
+  // Refresh templates from API
   const refreshTemplates = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const fetchedTemplates = await TemplateStorage.getAll();
+
+      // Fetch templates from API
+      const response = await fetch("/api/templates");
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch templates: ${response.status}`);
+      }
+
+      const fetchedTemplates = await response.json();
       setTemplates(fetchedTemplates);
 
       // If there was a selected template, refresh it
       if (selectedTemplate) {
         const refreshedTemplate = fetchedTemplates.find(
-          (t) => t.id === selectedTemplate.id
+          (t: Template) => t.id === selectedTemplate.id
         );
         setSelectedTemplate(refreshedTemplate || null);
       }
     } catch (err) {
+      console.error("Error fetching templates:", err);
       setError("Failed to load templates");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -71,11 +79,25 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
   const createTemplate = async (name: string, fields: Omit<Field, "id">[]) => {
     try {
       setError(null);
-      const newTemplate = await TemplateStorage.create({ name, fields });
+
+      const response = await fetch("/api/templates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, fields }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create template");
+      }
+
+      const newTemplate = await response.json();
       await refreshTemplates();
       return newTemplate;
-    } catch (err) {
-      setError("Failed to create template");
+    } catch (err: any) {
+      setError(err.message || "Failed to create template");
       console.error(err);
       throw err;
     }
@@ -88,11 +110,27 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
   ) => {
     try {
       setError(null);
-      const updatedTemplate = await TemplateStorage.update(id, data);
+
+      const response = await fetch(`/api/templates/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || `Failed to update template with ID ${id}`
+        );
+      }
+
+      const updatedTemplate = await response.json();
       await refreshTemplates();
       return updatedTemplate;
-    } catch (err) {
-      setError("Failed to update template");
+    } catch (err: any) {
+      setError(err.message || "Failed to update template");
       console.error(err);
       throw err;
     }
@@ -102,7 +140,17 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
   const deleteTemplate = async (id: string) => {
     try {
       setError(null);
-      await TemplateStorage.delete(id);
+
+      const response = await fetch(`/api/templates/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || `Failed to delete template with ID ${id}`
+        );
+      }
 
       // If the deleted template was selected, deselect it
       if (selectedTemplate?.id === id) {
@@ -110,8 +158,8 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
       }
 
       await refreshTemplates();
-    } catch (err) {
-      setError("Failed to delete template");
+    } catch (err: any) {
+      setError(err.message || "Failed to delete template");
       console.error(err);
       throw err;
     }
@@ -125,10 +173,25 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const template = await TemplateStorage.getById(id);
+      // First check if we already have the template in state
+      const existingTemplate = templates.find((t) => t.id === id);
+      if (existingTemplate) {
+        setSelectedTemplate(existingTemplate);
+        return;
+      }
+
+      // If not, fetch it from the API
+      const response = await fetch(`/api/templates/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch template with ID ${id}`);
+      }
+
+      const template = await response.json();
       setSelectedTemplate(template);
     } catch (err) {
       console.error(`Failed to select template with ID ${id}:`, err);
+      setError(`Failed to select template with ID ${id}`);
     }
   };
 
