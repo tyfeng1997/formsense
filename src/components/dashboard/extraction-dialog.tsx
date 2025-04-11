@@ -1,7 +1,7 @@
 "use client";
 
-import { useTemplates } from "@/components/template/template-context";
-import { Template } from "@/lib/template-storage";
+import { useTemplates } from "@/hooks/useTemplates";
+import { Template } from "@/lib/template-supabase";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings, Wand2, Plus, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { FileText, Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface ExtractionDialogProps {
@@ -31,7 +30,9 @@ export function ExtractionDialog({
   selectedCount,
 }: ExtractionDialogProps) {
   const router = useRouter();
-  const { templates, isLoading, error } = useTemplates();
+  const { templates, isLoading, error } = useTemplates({
+    autoFetch: true,
+  });
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

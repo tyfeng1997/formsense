@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Template, Field } from "@/lib/template-storage";
+import { Template, Field } from "@/lib/template-supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -19,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useTemplates } from "@/components/template/template-context";
+import { useTemplates } from "@/hooks/useTemplates";
 
 interface TemplateDetailProps {
   template: Template;
@@ -51,7 +50,10 @@ export function TemplateDetail({
   template,
   onSelectChange,
 }: TemplateDetailProps) {
-  const { templates, updateTemplate, deleteTemplate } = useTemplates();
+  // Use our hook to access the API methods
+  const { templates, updateTemplate, deleteTemplate } = useTemplates({
+    autoFetch: true, // We want to make sure templates are loaded
+  });
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

@@ -1,7 +1,6 @@
 "use client";
 
-import { useTemplates } from "@/components/template/template-context";
-import { Template } from "@/lib/template-storage";
+import { Template } from "@/lib/template-supabase";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTemplates } from "@/hooks/useTemplates";
 
 interface TemplateSelectionDialogProps {
   open: boolean;
@@ -30,7 +30,9 @@ export function TemplateSelectionDialog({
   currentTemplateId = null,
 }: TemplateSelectionDialogProps) {
   const router = useRouter();
-  const { templates, isLoading, error } = useTemplates();
+  const { templates, isLoading, error } = useTemplates({
+    autoFetch: true,
+  });
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

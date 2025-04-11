@@ -16,8 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ExtractedResults } from "./extracted-results";
-import { useTemplates } from "@/components/template/template-context";
-import { Template } from "@/lib/template-storage";
+import { useTemplates } from "@/hooks/useTemplates";
+import { Template } from "@/lib/template-supabase";
 import { TemplateSelectionDialog } from "./template-selection-dialog";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
@@ -44,12 +44,16 @@ type ExtractionResult = {
 export function FormImagesProcessor() {
   const router = useRouter();
 
+  // Use our hook instead of context
   const {
     templates,
     selectedTemplate,
     selectTemplate,
     isLoading: isLoadingTemplates,
-  } = useTemplates();
+    refreshTemplates,
+  } = useTemplates({
+    autoFetch: true,
+  });
 
   const [images, setImages] = useState<FormImage[]>([]);
   const [isDragging, setIsDragging] = useState(false);

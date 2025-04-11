@@ -1,7 +1,6 @@
 // app/dashboard/layout.tsx
 import { createClient } from "@/utils/supabase/server";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import { Providers } from "../providers";
 import { WelcomeModal } from "@/components/dashboard/welcome-modal";
 
 export default async function DashboardLayout({
@@ -15,7 +14,7 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <Providers>
+    <div>
       <div className="flex min-h-screen bg-gray-50">
         {/* Sidebar with user info */}
         <Sidebar user={user || undefined} />
@@ -32,6 +31,6 @@ export default async function DashboardLayout({
 
       {/* Welcome modal - will only show when welcome=new param is present */}
       <WelcomeModal />
-    </Providers>
+    </div>
   );
 }

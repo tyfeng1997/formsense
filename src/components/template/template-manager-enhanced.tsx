@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Template, Field } from "@/lib/template-storage";
+import { Template, Field } from "@/lib/template-supabase";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Search, Loader2, X, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { TemplateCard } from "@/components/template/template-card";
 import { TemplateDetail } from "@/components/template/template-detail";
-import { useTemplates } from "@/components/template/template-context";
+import { useTemplates } from "@/hooks/useTemplates";
 
 interface TemplateManagerProps {
   onSelectTemplate?: (template: Template | null) => void;
@@ -28,14 +28,17 @@ export function TemplateManager({
   onSelectTemplate,
   selectedTemplateId = null,
 }: TemplateManagerProps) {
+  // Use our custom hook instead of context
   const {
     templates,
-    selectedTemplate: contextSelectedTemplate,
-    selectTemplate: contextSelectTemplate,
+    selectedTemplate: hookSelectedTemplate,
+    selectTemplate,
     createTemplate,
     isLoading,
     error,
-  } = useTemplates();
+  } = useTemplates({
+    initialSelectedId: selectedTemplateId,
+  });
 
   // Local state
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,18 +48,19 @@ export function TemplateManager({
     Omit<Field, "id">[]
   >([{ name: "", description: "" }]);
 
-  // Determine which selected template to use - props or context
+  // Determine which selected template to use - props or hook
   const selectedTemplate =
     selectedTemplateId !== null
-      ? templates.find((t) => t.id === selectedTemplateId) || null
-      : contextSelectedTemplate;
+      ? templates.find((t) => t.id === selectedTemplateId) ||
+        hookSelectedTemplate
+      : hookSelectedTemplate;
 
   // Handle selecting a template
   const handleSelectTemplate = (template: Template) => {
     if (onSelectTemplate) {
       onSelectTemplate(template);
     } else {
-      contextSelectTemplate(template.id);
+      selectTemplate(template.id);
     }
   };
 
@@ -65,12 +69,12 @@ export function TemplateManager({
     template.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sync selected template ID to context when it changes
+  // Sync selected template ID when it changes from props
   useEffect(() => {
     if (selectedTemplateId) {
-      contextSelectTemplate(selectedTemplateId);
+      selectTemplate(selectedTemplateId);
     }
-  }, [selectedTemplateId, contextSelectTemplate]);
+  }, [selectedTemplateId, selectTemplate]);
 
   // Add a new field
   const addField = () => {

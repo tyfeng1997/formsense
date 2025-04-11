@@ -1,56 +1,29 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Template, Field } from "@/lib/template-supabase";
 
-interface TemplateContextType {
-  templates: Template[];
-  selectedTemplate: Template | null;
-  isLoading: boolean;
-  error: string | null;
-  createTemplate: (
-    name: string,
-    fields: Omit<Field, "id">[]
-  ) => Promise<Template>;
-  updateTemplate: (
-    id: string,
-    data: Partial<Omit<Template, "id" | "createdAt" | "updatedAt">>
-  ) => Promise<Template>;
-  deleteTemplate: (id: string) => Promise<void>;
-  selectTemplate: (id: string | null) => void;
-  refreshTemplates: () => Promise<void>;
+interface UseTemplatesOptions {
+  initialSelectedId?: string | null;
+  autoFetch?: boolean;
 }
 
-const TemplateContext = createContext<TemplateContextType | undefined>(
-  undefined
-);
+export function useTemplates(options: UseTemplatesOptions = {}) {
+  const { initialSelectedId = null, autoFetch = true } = options;
 
-export function TemplateProvider({ children }: { children: ReactNode }) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(autoFetch);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch templates on mount
-  useEffect(() => {
-    refreshTemplates();
-  }, []);
-
-  // Refresh templates from API
-  const refreshTemplates = async () => {
+  // Fetch templates
+  const fetchTemplates = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch templates from API
       const response = await fetch("/api/templates");
 
       if (!response.ok) {
@@ -59,23 +32,57 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
 
       const fetchedTemplates = await response.json();
       setTemplates(fetchedTemplates);
-
-      // If there was a selected template, refresh it
-      if (selectedTemplate) {
-        const refreshedTemplate = fetchedTemplates.find(
-          (t: Template) => t.id === selectedTemplate.id
-        );
-        setSelectedTemplate(refreshedTemplate || null);
-      }
-    } catch (err) {
+      return fetchedTemplates;
+    } catch (err: any) {
       console.error("Error fetching templates:", err);
       setError("Failed to load templates");
+      return [];
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  // Initialize templates on mount if autoFetch is true
+  useEffect(() => {
+    if (autoFetch) {
+      fetchTemplates().then((fetchedTemplates) => {
+        // Set selected template if initialSelectedId is provided
+        if (initialSelectedId) {
+          const template = fetchedTemplates.find(
+            (t) => t.id === initialSelectedId
+          );
+          if (template) {
+            setSelectedTemplate(template);
+          } else {
+            // If the template with the provided ID wasn't found, attempt to fetch it directly
+            fetchTemplateById(initialSelectedId).catch(console.error);
+          }
+        }
+      });
+    }
+  }, [autoFetch, fetchTemplates, initialSelectedId]);
+
+  // Fetch a single template by ID
+  const fetchTemplateById = async (id: string) => {
+    try {
+      setError(null);
+
+      const response = await fetch(`/api/templates/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch template with ID ${id}`);
+      }
+
+      const template = await response.json();
+      return template;
+    } catch (err: any) {
+      console.error(`Failed to fetch template with ID ${id}:`, err);
+      setError(`Failed to fetch template with ID ${id}`);
+      throw err;
+    }
   };
 
-  // Create new template
+  // Create a new template
   const createTemplate = async (name: string, fields: Omit<Field, "id">[]) => {
     try {
       setError(null);
@@ -94,7 +101,9 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
       }
 
       const newTemplate = await response.json();
-      await refreshTemplates();
+
+      // Update the local state with the new template
+      await fetchTemplates();
       return newTemplate;
     } catch (err: any) {
       setError(err.message || "Failed to create template");
@@ -103,7 +112,7 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Update template
+  // Update an existing template
   const updateTemplate = async (
     id: string,
     data: Partial<Omit<Template, "id" | "createdAt" | "updatedAt">>
@@ -127,7 +136,15 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
       }
 
       const updatedTemplate = await response.json();
-      await refreshTemplates();
+
+      // Update local state
+      await fetchTemplates();
+
+      // If this was the selected template, update it
+      if (selectedTemplate?.id === id) {
+        setSelectedTemplate(updatedTemplate);
+      }
+
       return updatedTemplate;
     } catch (err: any) {
       setError(err.message || "Failed to update template");
@@ -136,7 +153,7 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Delete template
+  // Delete a template
   const deleteTemplate = async (id: string) => {
     try {
       setError(null);
@@ -157,7 +174,8 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
         setSelectedTemplate(null);
       }
 
-      await refreshTemplates();
+      // Update local state
+      await fetchTemplates();
     } catch (err: any) {
       setError(err.message || "Failed to delete template");
       console.error(err);
@@ -181,13 +199,7 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
       }
 
       // If not, fetch it from the API
-      const response = await fetch(`/api/templates/${id}`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch template with ID ${id}`);
-      }
-
-      const template = await response.json();
+      const template = await fetchTemplateById(id);
       setSelectedTemplate(template);
     } catch (err) {
       console.error(`Failed to select template with ID ${id}:`, err);
@@ -195,7 +207,7 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = {
+  return {
     templates,
     selectedTemplate,
     isLoading,
@@ -204,22 +216,6 @@ export function TemplateProvider({ children }: { children: ReactNode }) {
     updateTemplate,
     deleteTemplate,
     selectTemplate,
-    refreshTemplates,
+    refreshTemplates: fetchTemplates,
   };
-
-  return (
-    <TemplateContext.Provider value={value}>
-      {children}
-    </TemplateContext.Provider>
-  );
-}
-
-export function useTemplates() {
-  const context = useContext(TemplateContext);
-
-  if (context === undefined) {
-    throw new Error("useTemplates must be used within a TemplateProvider");
-  }
-
-  return context;
 }
