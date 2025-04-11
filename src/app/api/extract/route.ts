@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Special handling for WeChat images which might have format issues
-        let processedFile = file;
+        const processedFile = file;
         if (
           file.name.toLowerCase().includes("wechat") ||
           file.name.toLowerCase().includes("微信")
@@ -141,7 +141,8 @@ If you can't find a value, use an empty string.`;
           });
 
           // Parse the response from Claude
-          const responseText = response.content[0].text;
+          const responseText =
+            "text" in response.content[0] ? response.content[0].text : "";
           console.log(
             `Received response for ${entry.name}:`,
             responseText.substring(0, 100) + "..."
@@ -214,8 +215,10 @@ If you can't find a value, use an empty string.`;
               ],
             });
 
-            const fallbackText = fallbackResponse.content[0].text;
-
+            const fallbackText =
+              "text" in fallbackResponse.content[0]
+                ? fallbackResponse.content[0].text
+                : "";
             try {
               const jsonMatch =
                 fallbackText.match(/```json\n([\s\S]*?)\n```/) ||

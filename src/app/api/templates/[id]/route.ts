@@ -4,11 +4,11 @@ import { createClient } from "@/utils/supabase/server";
 
 // GET /api/templates/[id] - Get a template by ID
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     // Create supabase server client
     const supabase = await createClient();
@@ -83,11 +83,11 @@ export async function GET(
 
 // PATCH /api/templates/[id] - Update a template
 export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     // Create supabase server client
     const supabase = await createClient();
@@ -102,7 +102,7 @@ export async function PATCH(
     }
 
     // Parse request body
-    const body = await req.json();
+    const body = await request.json();
 
     // Check if template exists and belongs to user
     const { data: existingTemplate, error: checkError } = await supabase
@@ -245,11 +245,11 @@ export async function PATCH(
 
 // DELETE /api/templates/[id] - Delete a template
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     // Create supabase server client
     const supabase = await createClient();

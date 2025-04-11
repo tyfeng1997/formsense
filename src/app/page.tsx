@@ -6,6 +6,8 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { TbFileExport } from "react-icons/tb";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import { AiOutlineApi } from "react-icons/ai";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "FormSense - Transform Form Images into Structured Data",
@@ -31,7 +33,11 @@ export const metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const isLoggedIn = !!data?.user;
+
   return (
     <main className="flex min-h-screen flex-col">
       {/* Navigation */}
@@ -55,6 +61,21 @@ export default function Home() {
           >
             <BsTwitterX className="mr-1" /> Follow Our Journey
           </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/dashboard"
+              className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-md transition"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded-md transition mr-2"
+            >
+              Login
+            </Link>
+          )}
           <a
             href="#waitlist"
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition"
@@ -413,7 +434,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section Placeholder */}
+      {/* Pricing Section Placeholder - Modified to show only Basic and Professional */}
       <section id="pricing" className="py-20 px-8 bg-white">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Pricing</h2>
@@ -421,106 +442,15 @@ export default function Home() {
             Flexible plans to meet your document processing needs. Early
             adopters will receive special pricing.
           </p>
-          <p className="text-amber-600 font-medium italic mb-10 max-w-3xl mx-auto">
-            NOTE: These prices are not final and may change before our official
-            launch. Join our waitlist to be notified of our final pricing
-            structure.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition">
               <h3 className="text-xl font-bold mb-2">Basic</h3>
               <p className="text-gray-500 mb-4">
                 For individuals and small businesses
               </p>
               <p className="text-4xl font-bold mb-6">
-                $19.9<span className="text-lg text-gray-500">/month</span>
-              </p>
-              <ul className="text-left space-y-3 mb-8">
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">
-                    Process up to 100 documents/month
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">
-                    Full field extraction capabilities
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">All export formats</span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">Standard support</span>
-                </li>
-              </ul>
-              <a
-                href="#waitlist"
-                className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
-              >
-                Join Waitlist
-              </a>
-            </div>
-
-            <div className="border-2 border-blue-600 rounded-lg p-8 shadow-lg relative">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                Most Popular
-              </div>
-              <h3 className="text-xl font-bold mb-2">Professional</h3>
-              <p className="text-gray-500 mb-4">For growing teams</p>
-              <p className="text-4xl font-bold mb-6">
-                $49.9<span className="text-lg text-gray-500">/month</span>
+                $9.9<span className="text-lg text-gray-500">/month</span>
               </p>
               <ul className="text-left space-y-3 mb-8">
                 <li className="flex items-start">
@@ -556,40 +486,8 @@ export default function Home() {
                     />
                   </svg>
                   <span className="text-gray-700">
-                    Custom configuration options
+                    All core features included
                   </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">Batch processing tools</span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">Priority support</span>
                 </li>
               </ul>
               <a
@@ -600,10 +498,15 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition">
-              <h3 className="text-xl font-bold mb-2">Enterprise</h3>
-              <p className="text-gray-500 mb-4">For large organizations</p>
-              <p className="text-4xl font-bold mb-6">Custom</p>
+            <div className="border-2 border-blue-600 rounded-lg p-8 shadow-lg relative">
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                Most Popular
+              </div>
+              <h3 className="text-xl font-bold mb-2">Professional</h3>
+              <p className="text-gray-500 mb-4">For growing teams</p>
+              <p className="text-4xl font-bold mb-6">
+                $19.9<span className="text-lg text-gray-500">/month</span>
+              </p>
               <ul className="text-left space-y-3 mb-8">
                 <li className="flex items-start">
                   <svg
@@ -619,7 +522,9 @@ export default function Home() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span className="text-gray-700">Unlimited documents</span>
+                  <span className="text-gray-700">
+                    Process up to 1500 documents/month
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -636,47 +541,15 @@ export default function Home() {
                     />
                   </svg>
                   <span className="text-gray-700">
-                    Custom tailored solutions
+                    All core features included
                   </span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">API access</span>
-                </li>
-                <li className="flex items-start">
-                  <svg
-                    className="h-6 w-6 text-green-500 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">Dedicated support</span>
                 </li>
               </ul>
               <a
                 href="#waitlist"
                 className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
               >
-                Contact Us
+                Join Waitlist
               </a>
             </div>
           </div>

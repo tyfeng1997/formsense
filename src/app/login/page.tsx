@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [isSignupComplete, setIsSignupComplete] = useState(false);
   const [signupEmail, setSignupEmail] = useState("");
 
-  const handleSignup = async (formData) => {
+  const handleSignup = async (formData: any) => {
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword");
     const email = formData.get("email");

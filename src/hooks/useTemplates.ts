@@ -49,7 +49,7 @@ export function useTemplates(options: UseTemplatesOptions = {}) {
         // Set selected template if initialSelectedId is provided
         if (initialSelectedId) {
           const template = fetchedTemplates.find(
-            (t) => t.id === initialSelectedId
+            (t: any) => t.id === initialSelectedId
           );
           if (template) {
             setSelectedTemplate(template);
