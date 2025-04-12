@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { WelcomeModal } from "@/components/dashboard/welcome-modal";
+import SubscriptionSuccessNotification from "@/components/subscription/success-notification";
 
 export default async function DashboardLayout({
   children,
@@ -16,6 +17,8 @@ export default async function DashboardLayout({
   return (
     <div>
       <div className="flex min-h-screen bg-gray-50">
+        <SubscriptionSuccessNotification />
+
         {/* Sidebar with user info */}
         <Sidebar user={user || undefined} />
 
