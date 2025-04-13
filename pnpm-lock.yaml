@@ -20,6 +20,9 @@ importers:
       '@paddle/paddle-js':
         specifier: ^1.4.0
         version: 1.4.0
+      '@paddle/paddle-node-sdk':
+        specifier: ^2.6.0
+        version: 2.6.0
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.6
         version: 1.1.6(@types/react-dom@19.1.1(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -414,6 +417,10 @@ packages:
 
   '@paddle/paddle-js@1.4.0':
     resolution: {integrity: sha512-pX6Yx+RswB1rHMuYl8RKcAAVZhVJ6nd5f8w8l4kVM63pM3HNeQ5/Xuk4sK/X9P5fUE2dmN0mTti7+gZ8cZtqvg==}
+
+  '@paddle/paddle-node-sdk@2.6.0':
+    resolution: {integrity: sha512-tE8k1wpV/T6iaD/yAsYMSBqNA/zzQQU22rNj4BlPvCxSU2BDkDsZZQow6i5YpVfkdW5e8CS6rPYeRJHwsn/vag==}
+    engines: {node: '>=18'}
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
@@ -2745,6 +2752,8 @@ snapshots:
   '@nolyfill/is-core-module@1.0.39': {}
 
   '@paddle/paddle-js@1.4.0': {}
+
+  '@paddle/paddle-node-sdk@2.6.0': {}
 
   '@radix-ui/number@1.1.0': {}
 

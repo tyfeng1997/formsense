@@ -22,7 +22,9 @@ export const config = {
      */
     // "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
     "/dashboard/:path*",
-    "/api/:path*",
+    "/api/extract/:path*",
+    "/api/templates/:path*",
+    "/api/subscriptions/:path*",
     "/auth/:path*",
     "/login/:path*",
   ],
