@@ -125,31 +125,37 @@ export function TemplateDetail({
   return (
     <div className="space-y-4">
       {/* Template header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-md bg-primary/10 text-primary">
+      <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-md bg-blue-100 text-blue-600">
             <FileJson className="h-5 w-5" />
           </div>
-          <h2 className="text-lg font-medium">{template.name}</h2>
+          <h2 className="text-lg font-medium text-gray-800">{template.name}</h2>
         </div>
 
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+              >
                 Change Template
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="min-w-[180px]">
               {templates.map((t) => (
                 <DropdownMenuItem
                   key={t.id}
                   onClick={() => onSelectChange?.(t.id)}
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${
+                    t.id === template.id ? "bg-blue-50 text-blue-600" : ""
+                  }`}
                 >
                   {t.id === template.id && (
-                    <span className="h-2 w-2 rounded-full bg-primary" />
+                    <span className="h-2 w-2 rounded-full bg-blue-600" />
                   )}
                   <span className={t.id === template.id ? "font-medium" : ""}>
                     {t.name}
@@ -159,7 +165,12 @@ export function TemplateDetail({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" onClick={startEditing}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={startEditing}
+            className="text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+          >
             <Pencil className="h-4 w-4" />
           </Button>
 
@@ -167,6 +178,7 @@ export function TemplateDetail({
             variant="ghost"
             size="icon"
             onClick={() => setShowDeleteDialog(true)}
+            className="text-gray-500 hover:text-red-600 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -176,9 +188,12 @@ export function TemplateDetail({
       {/* Fields grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {template.fields.map((field) => (
-          <Card key={field.id} className="overflow-hidden">
-            <CardContent className="p-3">
-              <h3 className="font-medium">{field.name}</h3>
+          <Card
+            key={field.id}
+            className="overflow-hidden border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all"
+          >
+            <CardContent className="p-4">
+              <h3 className="font-medium text-gray-800">{field.name}</h3>
               {field.description && (
                 <p className="text-sm text-gray-500 mt-1">
                   {field.description}
@@ -193,25 +208,28 @@ export function TemplateDetail({
       <Dialog open={isEditMode} onOpenChange={setIsEditMode}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Template</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-gray-900">Edit Template</DialogTitle>
+            <DialogDescription className="text-gray-500">
               Update template name and fields
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="template-name">Template Name</Label>
+              <Label htmlFor="template-name" className="text-gray-700">
+                Template Name
+              </Label>
               <Input
                 id="template-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
               />
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>Fields</Label>
+                <Label className="text-gray-700">Fields</Label>
                 <span className="text-xs text-gray-500">
                   {fields.length} fields
                 </span>
@@ -225,7 +243,7 @@ export function TemplateDetail({
                     onChange={(e) =>
                       updateField(index, { name: e.target.value })
                     }
-                    className="flex-1"
+                    className="flex-1 border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                   />
                   <Input
                     placeholder="Description (optional)"
@@ -235,13 +253,13 @@ export function TemplateDetail({
                         description: e.target.value || undefined,
                       })
                     }
-                    className="flex-1"
+                    className="flex-1 border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                   />
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => removeField(index)}
-                    className="shrink-0"
+                    className="shrink-0 text-gray-400 hover:text-red-500 hover:bg-red-50"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -252,7 +270,7 @@ export function TemplateDetail({
                 variant="outline"
                 size="sm"
                 onClick={addField}
-                className="w-full"
+                className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Field
@@ -260,13 +278,18 @@ export function TemplateDetail({
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={cancelEditing}>
+          <DialogFooter className="border-t pt-4">
+            <Button
+              variant="outline"
+              onClick={cancelEditing}
+              className="border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+            >
               Cancel
             </Button>
             <Button
               onClick={saveChanges}
               disabled={!name || fields.length === 0}
+              className="bg-blue-600 hover:bg-blue-700 ml-2"
             >
               <Save className="h-4 w-4 mr-2" />
               Save Changes
@@ -279,14 +302,18 @@ export function TemplateDetail({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Template</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-gray-900">
+              Delete Template
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600">
               Are you sure you want to delete "{template.name}"? This action
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="border-t pt-4">
+            <AlertDialogCancel className="border-gray-200 hover:bg-gray-50 hover:border-gray-300">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-500 hover:bg-red-600"

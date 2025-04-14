@@ -38,8 +38,8 @@ export function TemplateSelectionDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select Template</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-gray-900">Select Template</DialogTitle>
+          <DialogDescription className="text-gray-500">
             Choose a template to use for extraction
           </DialogDescription>
         </DialogHeader>
@@ -47,29 +47,35 @@ export function TemplateSelectionDialog({
         <div className="py-4">
           {isLoading ? (
             <div className="flex justify-center items-center p-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
-              <p>Loading templates...</p>
+              <Loader2 className="h-6 w-6 animate-spin text-blue-600 mr-2" />
+              <p className="text-gray-600">Loading templates...</p>
             </div>
           ) : error ? (
-            <div className="text-center text-red-500 p-4">
-              <p>{error}</p>
+            <div className="text-center p-4">
+              <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
+                <p>{error}</p>
+              </div>
               <Button
                 variant="outline"
-                className="mt-2"
+                className="mt-2 border-blue-200 text-blue-600 hover:bg-blue-50"
                 onClick={() => router.push("/dashboard/templates")}
               >
                 Manage Templates
               </Button>
             </div>
           ) : templates.length === 0 ? (
-            <div className="text-center p-6">
-              <p className="text-gray-500 mb-4">No templates found</p>
+            <div className="text-center p-6 bg-gray-50 rounded-lg border">
+              <div className="bg-blue-100 rounded-full p-3 inline-flex mb-3">
+                <FileText className="h-6 w-6 text-blue-600" />
+              </div>
+              <p className="text-gray-700 mb-4">No templates found</p>
               {onCreateTemplate && (
                 <Button
                   onClick={() => {
                     onClose();
                     onCreateTemplate();
                   }}
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Template
@@ -77,7 +83,7 @@ export function TemplateSelectionDialog({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {templates.map((template) => (
                 <button
                   key={template.id}
@@ -85,23 +91,31 @@ export function TemplateSelectionDialog({
                     onSelectTemplate(template);
                     onClose();
                   }}
-                  className={`flex items-start gap-4 p-4 rounded-lg border hover:border-primary transition-colors hover:bg-primary/5 w-full text-left ${
+                  className={`flex items-start gap-4 p-4 rounded-lg border transition-all hover:shadow-md w-full text-left ${
                     template.id === currentTemplateId
-                      ? "border-primary bg-primary/5"
-                      : ""
+                      ? "border-blue-300 bg-blue-50 shadow-sm"
+                      : "border-gray-200 hover:border-blue-200 hover:bg-blue-50/30"
                   }`}
                 >
                   <div
                     className={`p-2 rounded-full ${
                       template.id === currentTemplateId
-                        ? "bg-primary text-white"
-                        : "bg-primary/10 text-primary"
+                        ? "bg-blue-600 text-white"
+                        : "bg-blue-100 text-blue-600"
                     } shrink-0`}
                   >
                     <FileText className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium">{template.name}</h3>
+                    <h3
+                      className={`font-medium ${
+                        template.id === currentTemplateId
+                          ? "text-blue-700"
+                          : "text-gray-800"
+                      }`}
+                    >
+                      {template.name}
+                    </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       {template.fields.length} fields including:{" "}
                       {template.fields
@@ -120,13 +134,15 @@ export function TemplateSelectionDialog({
                     onClose();
                     onCreateTemplate();
                   }}
-                  className="flex items-start gap-4 p-4 rounded-lg border border-dashed hover:border-primary transition-colors hover:bg-primary/5 w-full text-left"
+                  className="flex items-start gap-4 p-4 rounded-lg border border-dashed border-gray-300 hover:border-blue-300 transition-colors hover:bg-blue-50/30 w-full text-left"
                 >
-                  <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
+                  <div className="p-2 rounded-full bg-blue-100 text-blue-600 shrink-0">
                     <Plus className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Create New Template</h3>
+                    <h3 className="font-medium text-gray-800">
+                      Create New Template
+                    </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       Define specific fields to extract based on your
                       requirements.
@@ -138,14 +154,18 @@ export function TemplateSelectionDialog({
           )}
         </div>
 
-        <DialogFooter className="sm:justify-start">
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="sm:justify-start border-t pt-4">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+          >
             Cancel
           </Button>
           <Button
             variant="outline"
             onClick={() => router.push("/dashboard/templates")}
-            className="ml-2"
+            className="ml-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
           >
             Manage All Templates
           </Button>

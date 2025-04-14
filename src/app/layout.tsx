@@ -1,7 +1,7 @@
 // src/app/layout.tsx
 import "./globals.css";
 import { Inter } from "next/font/google";
-
+import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -87,6 +87,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           }
         `}</script>
       </head>
+      <Toaster position="top-right" />
+
       <body className={inter.className}>{children}</body>
     </html>
   );

@@ -1,4 +1,3 @@
-// components/dashboard/sidebar.tsx
 "use client";
 
 import { useState } from "react";
@@ -11,6 +10,9 @@ import {
   X,
   LogOut,
   User as UserIcon,
+  CreditCard,
+  BarChart2,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -58,14 +61,19 @@ export function Sidebar({ user }: SidebarProps) {
       <Link
         href={href}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+          "flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors",
           isActive
-            ? "bg-primary/10 text-primary font-medium"
-            : "hover:bg-gray-100 text-gray-700"
+            ? "bg-blue-50 text-blue-600 font-medium border-l-4 border-blue-600"
+            : "hover:bg-gray-50 text-gray-700 hover:text-blue-600"
         )}
         onClick={() => setIsOpen(false)}
       >
-        <Icon className="h-5 w-5" />
+        <Icon
+          className={cn(
+            "h-5 w-5",
+            isActive ? "text-blue-600" : "text-gray-500"
+          )}
+        />
         <span>{label}</span>
       </Link>
     );
@@ -86,7 +94,7 @@ export function Sidebar({ user }: SidebarProps) {
           variant="outline"
           size="icon"
           onClick={toggleSidebar}
-          className="rounded-full bg-white"
+          className="rounded-full bg-white shadow-sm hover:bg-blue-50 hover:text-blue-600"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -95,7 +103,7 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Mobile sidebar backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -103,14 +111,14 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Sidebar content */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-full w-64 bg-white border-r shadow-sm p-4 flex flex-col transition-transform md:translate-x-0",
+          "fixed left-0 top-0 z-50 h-full w-64 bg-gray-50 border-r shadow-sm p-5 flex flex-col transition-transform md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         <div className="flex items-center justify-between mb-8">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <h1 className="text-xl font-bold">FormSense</h1>
-            <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+            <h1 className="text-xl font-bold text-blue-600">FormSense</h1>
+            <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-medium">
               App
             </span>
           </Link>
@@ -118,31 +126,55 @@ export function Sidebar({ user }: SidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden hover:bg-blue-50 hover:text-blue-600"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <nav className="space-y-1 flex-1">
+        <nav className="space-y-1.5 flex-1">
           <NavItem href="/dashboard" icon={FileImage} label="Form Images" />
           <NavItem
             href="/dashboard/templates"
             icon={FileJson}
             label="Extraction Templates"
           />
+
+          {/* Add divider between main navigation items and account section */}
+          <div className="pt-5 pb-3 mt-4 border-t border-gray-200">
+            <p className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Account
+            </p>
+          </div>
+
+          {/* Add three new navigation items */}
+          <NavItem
+            href="/dashboard/pricing"
+            icon={CreditCard}
+            label="Pricing Plans"
+          />
+          <NavItem
+            href="/dashboard/usage"
+            icon={BarChart2}
+            label="Usage Stats"
+          />
+          <NavItem
+            href="/dashboard/subscription"
+            icon={Package}
+            label="My Subscription"
+          />
         </nav>
 
-        <div className="border-t pt-4 mt-auto space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="border-t border-gray-200 pt-4 mt-auto space-y-4">
+          <div className="flex items-center justify-between p-2 rounded-md hover:bg-blue-50 transition-colors">
             <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-9 w-9 bg-blue-100 text-blue-600 border border-blue-200">
                 <AvatarFallback>{getUserInitials()}</AvatarFallback>
               </Avatar>
               <div className="text-sm">
                 <p
-                  className="font-medium truncate w-32"
+                  className="font-medium truncate w-32 text-gray-800"
                   title={user?.email || ""}
                 >
                   {user?.email}
@@ -151,14 +183,18 @@ export function Sidebar({ user }: SidebarProps) {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
-                  <UserIcon className="h-5 w-5" />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:bg-blue-100 hover:text-blue-600 h-8 w-8"
+                >
+                  <UserIcon className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={handleSignOut}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-red-500 hover:text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
@@ -167,7 +203,7 @@ export function Sidebar({ user }: SidebarProps) {
             </DropdownMenu>
           </div>
 
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 px-2">
             <p>FormSense Alpha Version</p>
           </div>
         </div>
