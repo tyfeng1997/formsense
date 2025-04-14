@@ -353,27 +353,30 @@ export function FormImagesProcessor() {
     return (
       <div className="flex justify-center items-center p-12">
         <div className="animate-spin mr-2">
-          <FileText className="h-6 w-6 text-primary" />
+          <FileText className="h-6 w-6 text-blue-600" />
         </div>
-        <p>Loading templates...</p>
+        <p className="text-gray-600">Loading templates...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Form Images</CardTitle>
+      <Card className="border-gray-200 shadow-sm">
+        <CardHeader className="bg-gray-50 border-b border-gray-200 pb-4">
+          <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
+            <FileImage className="h-5 w-5 text-blue-600" />
+            Upload Form Images
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           {/* Upload area */}
           <div
             className={cn(
-              "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+              "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all",
               isDragging
-                ? "border-primary bg-primary/5"
-                : "border-gray-300 hover:border-primary/50 hover:bg-gray-50"
+                ? "border-blue-400 bg-blue-50"
+                : "border-gray-300 hover:border-blue-300 hover:bg-gray-50"
             )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -389,8 +392,10 @@ export function FormImagesProcessor() {
               onChange={handleFileChange}
             />
             <div className="flex flex-col items-center justify-center gap-2">
-              <Upload className="h-10 w-10 text-gray-400" />
-              <p className="text-base font-medium">
+              <div className="rounded-full bg-blue-100 p-3 mb-2">
+                <Upload className="h-8 w-8 text-blue-600" />
+              </div>
+              <p className="text-base font-medium text-gray-800">
                 Drag and drop image files or click to browse
               </p>
               <p className="text-sm text-gray-500">
@@ -404,14 +409,14 @@ export function FormImagesProcessor() {
           {images.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">
+                <h3 className="text-sm font-medium text-gray-700">
                   Uploaded Images ({images.length})
                 </h3>
                 <div className="flex items-center gap-3">
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-xs"
+                    className="text-xs border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                     onClick={() =>
                       handleSelectAll(!images.some((img) => img.selected))
                     }
@@ -425,6 +430,7 @@ export function FormImagesProcessor() {
                     size="sm"
                     onClick={handleExtractClick}
                     disabled={selectedImagesCount === 0 || isExtracting}
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Extract ({selectedImagesCount})
@@ -437,8 +443,10 @@ export function FormImagesProcessor() {
                   <div
                     key={image.id}
                     className={cn(
-                      "relative group aspect-square rounded-md overflow-hidden border",
-                      image.selected ? "border-primary" : "border-gray-200"
+                      "relative group aspect-square rounded-md overflow-hidden border shadow-sm transition-all",
+                      image.selected
+                        ? "border-blue-400 ring-1 ring-blue-400"
+                        : "border-gray-200 hover:border-blue-200"
                     )}
                   >
                     <img
@@ -448,13 +456,13 @@ export function FormImagesProcessor() {
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <button
-                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow"
+                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-red-50"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleRemoveImage(image.id);
                         }}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-3 w-3 text-red-500" />
                       </button>
                     </div>
 
@@ -468,10 +476,10 @@ export function FormImagesProcessor() {
                     >
                       <div
                         className={cn(
-                          "w-5 h-5 rounded flex items-center justify-center",
+                          "w-5 h-5 rounded flex items-center justify-center shadow-sm",
                           image.selected
-                            ? "bg-primary text-white"
-                            : "bg-white border border-gray-300"
+                            ? "bg-blue-600 text-white"
+                            : "bg-white border border-gray-300 hover:border-blue-400"
                         )}
                       >
                         {image.selected && <Check className="h-3 w-3" />}
@@ -492,25 +500,31 @@ export function FormImagesProcessor() {
 
       {/* Current Template Section */}
       {images.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle>Extraction Template</CardTitle>
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 border-b border-gray-200 pb-3">
+            <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Extraction Template
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {selectedTemplate ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-md bg-primary/10 text-primary">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-blue-100 text-blue-600">
                       <FileText className="h-5 w-5" />
                     </div>
-                    <h3 className="font-medium">{selectedTemplate.name}</h3>
+                    <h3 className="font-medium text-gray-800">
+                      {selectedTemplate.name}
+                    </h3>
                   </div>
 
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowTemplateSelectionDialog(true)}
+                    className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
                   >
                     Change Template
                   </Button>
@@ -520,11 +534,13 @@ export function FormImagesProcessor() {
                   {selectedTemplate.fields.map((field) => (
                     <div
                       key={field.id}
-                      className="border bg-gray-50 p-2 rounded"
+                      className="border border-gray-200 bg-gray-50 p-3 rounded-md shadow-sm hover:border-blue-200 transition-colors"
                     >
-                      <p className="font-medium text-sm">{field.name}</p>
+                      <p className="font-medium text-sm text-gray-800">
+                        {field.name}
+                      </p>
                       {field.description && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 mt-1">
                           {field.description}
                         </p>
                       )}
@@ -533,12 +549,13 @@ export function FormImagesProcessor() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between">
-                <p className="text-gray-500">No template selected</p>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md border border-gray-200">
+                <p className="text-gray-600">No template selected</p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowTemplateSelectionDialog(true)}
+                  className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
                 >
                   Select Template
                 </Button>
@@ -549,9 +566,12 @@ export function FormImagesProcessor() {
       )}
 
       {/* Results Section */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Extracted Results</CardTitle>
+      <Card className="border-gray-200 shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-gray-50 border-b border-gray-200 pb-4">
+          <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-blue-600" />
+            Extracted Results
+          </CardTitle>
           {results.length > 0 && (
             <Button
               variant="outline"
@@ -562,27 +582,32 @@ export function FormImagesProcessor() {
                     "Your changes to the extracted data have been saved.",
                 });
               }}
+              className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
             >
               <Save className="h-4 w-4 mr-2" />
               Save Changes
             </Button>
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {isExtracting ? (
             <div className="flex flex-col items-center justify-center py-10 space-y-4">
               <div className="flex flex-col items-center gap-2">
-                <div className="animate-spin">
-                  <FileText className="h-8 w-8 text-primary" />
+                <div className="animate-spin rounded-full p-3 bg-blue-100">
+                  <FileText className="h-8 w-8 text-blue-600" />
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600 font-medium">
                   Extracting data from selected images...
                 </p>
               </div>
 
               {/* Progress tracking */}
               <div className="w-full max-w-md space-y-2">
-                <Progress value={extractionProgress} className="h-2" />
+                <Progress
+                  value={extractionProgress}
+                  className="h-2 bg-gray-100"
+                  // indicatorClassName="bg-blue-600"
+                />
                 <p className="text-xs text-center text-gray-500">
                   Processing image {processedCount} of {totalToProcess}
                   {processedCount > 0 &&
@@ -594,7 +619,9 @@ export function FormImagesProcessor() {
               {/* Display partial results while processing */}
               {results.length > 0 && (
                 <div className="w-full mt-4">
-                  <p className="text-sm font-medium mb-2">Partial Results</p>
+                  <p className="text-sm font-medium mb-2 text-gray-700">
+                    Partial Results
+                  </p>
                   <ExtractedResults
                     results={results}
                     template={selectedTemplate}
@@ -610,12 +637,18 @@ export function FormImagesProcessor() {
               onUpdateResults={handleUpdateResults}
             />
           ) : (
-            <div className="text-center py-12 border border-dashed rounded-md">
-              <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 mb-1">No extracted data yet</p>
-              <p className="text-sm text-gray-400">
-                Select images and click extract to process them
-              </p>
+            <div className="text-center py-12 border border-dashed rounded-md bg-gray-50 border-gray-200">
+              <div className="flex flex-col items-center gap-2">
+                <div className="rounded-full bg-blue-100 p-3">
+                  <AlertCircle className="h-6 w-6 text-blue-600" />
+                </div>
+                <p className="text-gray-700 font-medium">
+                  No extracted data yet
+                </p>
+                <p className="text-sm text-gray-500">
+                  Select images and click extract to process them
+                </p>
+              </div>
             </div>
           )}
         </CardContent>
