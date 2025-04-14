@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -51,12 +51,12 @@ export default function LoginPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
         <div className="w-full max-w-md">
-          <Card className="shadow-lg border-0">
+          <Card className="shadow-md border border-gray-100">
             <CardHeader className="text-center">
-              <div className="mx-auto my-4 bg-green-100 rounded-full p-3 w-12 h-12 flex items-center justify-center">
+              <div className="mx-auto my-4 bg-green-100 rounded-full p-3 w-14 h-14 flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-green-600"
+                  className="h-7 w-7 text-green-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -69,13 +69,15 @@ export default function LoginPage() {
                   />
                 </svg>
               </div>
-              <CardTitle className="text-xl">Check your email</CardTitle>
-              <CardDescription className="mt-2">
+              <CardTitle className="text-xl text-gray-800">
+                Check your email
+              </CardTitle>
+              <CardDescription className="mt-2 text-gray-600">
                 We've sent a verification link to{" "}
-                <span className="font-medium">{signupEmail}</span>
+                <span className="font-medium text-gray-800">{signupEmail}</span>
               </CardDescription>
             </CardHeader>
-            <CardContent className="text-center pb-6">
+            <CardContent className="text-center pb-8">
               <p className="text-sm text-gray-500 mb-6">
                 Please check your inbox and click on the verification link to
                 complete your registration.
@@ -86,7 +88,7 @@ export default function LoginPage() {
                   setActiveTab("login");
                 }}
                 variant="outline"
-                className="mt-2"
+                className="mt-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
               >
                 Back to Login
               </Button>
@@ -96,15 +98,16 @@ export default function LoginPage() {
       </div>
     );
   }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo and Brand */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-600 shadow-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-white"
+              className="h-8 w-8 text-white"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -117,48 +120,65 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">FormSense</h1>
-          <p className="text-center text-gray-500 text-sm">
-            Smart Form Data Extraction
+          <h1 className="text-3xl font-bold text-gray-800">FormSense</h1>
+          <p className="text-center text-gray-500">
+            Transform Form Images into Structured Data
           </p>
         </div>
 
-        <Card className="shadow-lg border-0">
+        <Card className="shadow-md border border-gray-100 overflow-hidden">
           <Tabs
             defaultValue="login"
             value={activeTab}
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-none border-b border-gray-200">
+              <TabsTrigger
+                value="login"
+                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="login" className="space-y-4 pt-4">
-              <CardHeader className="p-4 pb-0">
-                <CardTitle className="text-xl">Welcome back</CardTitle>
-                <CardDescription>
+            <TabsContent value="login" className="space-y-4 pt-6">
+              <CardHeader className="p-6 pb-0">
+                <CardTitle className="text-xl text-gray-800">
+                  Welcome back
+                </CardTitle>
+                <CardDescription className="text-gray-500">
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent className="p-6">
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email" className="text-gray-700">
+                      Email
+                    </Label>
                     <Input
                       id="login-email"
                       name="email"
                       type="email"
                       placeholder="you@example.com"
                       required
+                      className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="login-password">Password</Label>
+                      <Label htmlFor="login-password" className="text-gray-700">
+                        Password
+                      </Label>
                       <Link
                         href="/forgot-password"
-                        className="text-xs text-primary hover:underline"
+                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -168,26 +188,35 @@ export default function LoginPage() {
                       name="password"
                       type="password"
                       required
+                      className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
-                  <Button formAction={login} className="w-full" type="submit">
+                  <Button
+                    formAction={login}
+                    className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
+                    type="submit"
+                  >
                     Sign in
                   </Button>
                 </form>
               </CardContent>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4 pt-4">
-              <CardHeader className="p-4 pb-0">
-                <CardTitle className="text-xl">Create an account</CardTitle>
-                <CardDescription>
+            <TabsContent value="signup" className="space-y-4 pt-6">
+              <CardHeader className="p-6 pb-0">
+                <CardTitle className="text-xl text-gray-800">
+                  Create an account
+                </CardTitle>
+                <CardDescription className="text-gray-500">
                   Enter your details to create your account
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent className="p-6">
                 <form className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email" className="text-gray-700">
+                      Email
+                    </Label>
                     <Input
                       id="signup-email"
                       name="email"
@@ -195,47 +224,57 @@ export default function LoginPage() {
                       placeholder="you@example.com"
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
+                      className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password" className="text-gray-700">
+                      Password
+                    </Label>
                     <Input
                       id="signup-password"
                       name="password"
                       type="password"
                       placeholder="Create a strong password"
                       required
+                      className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label htmlFor="confirm-password" className="text-gray-700">
+                      Confirm Password
+                    </Label>
                     <Input
                       id="confirm-password"
                       name="confirmPassword"
                       type="password"
                       placeholder="Confirm your password"
                       required
+                      className="border-gray-300 focus:border-blue-300 focus:ring-blue-200"
                     />
                   </div>
                   <Button
                     formAction={(formData) => handleSignup(formData)}
-                    className="w-full"
+                    className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
                     type="submit"
                   >
                     Create account
                   </Button>
                 </form>
               </CardContent>
-              <CardFooter className="px-4 py-2 flex justify-center">
-                <p className="text-xs text-center text-gray-500">
+              <CardFooter className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <p className="text-xs text-center text-gray-500 w-full">
                   By signing up, you agree to our{" "}
-                  <Link href="/terms" className="text-primary hover:underline">
+                  <Link
+                    href="/terms"
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
                     Terms of Service
                   </Link>{" "}
                   and{" "}
                   <Link
                     href="/privacy"
-                    className="text-primary hover:underline"
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
                   >
                     Privacy Policy
                   </Link>
@@ -245,20 +284,23 @@ export default function LoginPage() {
           </Tabs>
         </Card>
 
-        {/* Alternative login methods (optional) */}
+        {/* Alternative login methods */}
         <div className="mt-8">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-gray-50 px-2 text-gray-500">
+              <span className="bg-gray-50 px-3 text-gray-500">
                 Or continue with
               </span>
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="w-full">
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            <Button
+              variant="outline"
+              className="w-full border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700"
+            >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -280,7 +322,10 @@ export default function LoginPage() {
               </svg>
               Google
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700"
+            >
               <svg
                 className="mr-2 h-4 w-4"
                 fill="currentColor"
