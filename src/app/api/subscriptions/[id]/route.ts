@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const subscriptionId = params.id;
+    const { id: subscriptionId } = await params;
     const supabase = await createClient();
 
     // Get the current user
