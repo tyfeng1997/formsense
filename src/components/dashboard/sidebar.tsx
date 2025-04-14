@@ -1,4 +1,3 @@
-// components/dashboard/sidebar.tsx
 "use client";
 
 import { useState } from "react";
@@ -11,6 +10,9 @@ import {
   X,
   LogOut,
   User as UserIcon,
+  CreditCard,
+  BarChart2,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -131,6 +134,30 @@ export function Sidebar({ user }: SidebarProps) {
             href="/dashboard/templates"
             icon={FileJson}
             label="Extraction Templates"
+          />
+
+          {/* Add divider between main navigation items and account section */}
+          <div className="pt-4 pb-2 mt-4 border-t border-gray-100">
+            <p className="px-3 text-xs font-medium text-gray-500 uppercase">
+              Account
+            </p>
+          </div>
+
+          {/* Add three new navigation items */}
+          <NavItem
+            href="/dashboard/pricing"
+            icon={CreditCard}
+            label="Pricing Plans"
+          />
+          <NavItem
+            href="/dashboard/usage"
+            icon={BarChart2}
+            label="Usage Stats"
+          />
+          <NavItem
+            href="/dashboard/subscription"
+            icon={Package}
+            label="My Subscription"
           />
         </nav>
 
