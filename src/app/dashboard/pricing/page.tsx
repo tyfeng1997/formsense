@@ -17,42 +17,30 @@ const plans = [
   {
     id: "free",
     name: "Free",
-    description: "Try out key features with limited access",
+    description: "Try it out",
     price: "$0",
     priceId: "free",
-    features: [
-      "Process up to 50 documents/month",
-      "Basic template support",
-      "Manual export functionality",
-      "Community support",
-    ],
+    features: ["Process up to 50 documents/month", "Basic features"],
     popular: false,
   },
   {
     id: "basic",
     name: "Basic",
-    description: "For individuals and small businesses",
+    description: "For individuals & small teams",
     price: "$9.9",
     priceId: "pri_01jrnh4z3hmr6zm4e6tf8fxg4x",
-    features: [
-      "Process up to 500 documents/month",
-      "All core features included",
-      "Template creation",
-      "Export to CSV/Excel",
-    ],
+    features: ["Process up to 500 documents/month", "All features included"],
     popular: false,
   },
   {
     id: "professional",
     name: "Professional",
-    description: "For growing teams",
+    description: "For growing businesses",
     price: "$19.9",
     priceId: "pri_01jrnh5sqd8kqmfe6jzf0sd6n0",
     features: [
       "Process up to 1500 documents/month",
-      "All core features included",
-      "Advanced template management",
-      "Priority customer support",
+      "Priority support & all features",
     ],
     popular: true,
   },
@@ -177,79 +165,81 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-16">
-      <div className="flex justify-end mb-6">
-        <Button asChild variant="outline" className="gap-2">
-          <a href="/dashboard">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.21863 7.33312L8.79467 3.75712L7.85201 2.81445L2.66667 7.99979L7.85201 13.1851L8.79467 12.2425L5.21863 8.66645H13.3333V7.33312H5.21863Z"
-                fill="currentColor"
-              />
-            </svg>
-            Back to Dashboard
-          </a>
-        </Button>
-      </div>
-
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold mb-4">Pricing Plans</h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Flexible plans to meet your document processing needs. Early adopters
-          will receive special pricing.
+    <div className="container max-w-6xl mx-auto px-4 py-12">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4 text-gray-800 flex items-center justify-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8 text-blue-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+            />
+          </svg>
+          Simple, Transparent Pricing
+        </h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          Choose the plan that suits your document processing needs. Free trial
+          available with no credit card required.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {plans.map((plan) => {
           const isActive = plan.priceId === activePriceId;
 
           return (
             <Card
               key={plan.id}
-              className={`relative p-8 border rounded-lg shadow-sm ${
-                plan.popular ? "border-blue-500 shadow-lg" : ""
-              } ${isActive ? "ring-2 ring-primary" : ""}`}
+              className={`relative p-8 border rounded-lg transition-all ${
+                plan.popular
+                  ? "border-blue-300 shadow-md"
+                  : "border-gray-200 shadow-sm"
+              } ${
+                isActive ? "ring-2 ring-blue-400 shadow-md" : ""
+              } hover:shadow-md`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 right-0 left-0 mx-auto w-36 bg-blue-600 text-white text-center py-1 px-4 rounded-full">
-                  Most Popular
+                <div className="absolute -top-3 right-0 left-0 mx-auto w-32 bg-blue-600 text-white text-center py-1 px-3 rounded-full text-sm font-medium">
+                  Popular
                 </div>
               )}
 
               {isActive && (
-                <Badge className="absolute top-4 right-4 bg-green-500">
-                  Current Plan
+                <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+                  Current
                 </Badge>
               )}
 
               <div className="flex flex-col h-full">
                 <div>
-                  <h2 className="text-3xl font-bold text-center">
+                  <h2 className="text-2xl font-bold text-center text-gray-800">
                     {plan.name}
                   </h2>
-                  <p className="text-muted-foreground text-center mt-2">
+                  <p className="text-gray-500 text-center mt-1 text-sm">
                     {plan.description}
                   </p>
 
-                  <div className="mt-8 text-center">
-                    <span className="text-6xl font-bold">{plan.price}</span>
-                    <span className="text-xl text-muted-foreground">
-                      /month
+                  <div className="mt-6 text-center">
+                    <span className="text-4xl font-bold text-gray-900">
+                      {plan.price}
                     </span>
+                    <span className="text-lg text-gray-500">/month</span>
                   </div>
 
-                  <ul className="mt-8 space-y-4">
+                  <ul className="mt-6 space-y-3">
                     {plan.features.map((feature, index) => (
                       <li className="flex items-start" key={index}>
                         <svg
-                          className="h-6 w-6 text-green-500 mr-2 flex-shrink-0"
+                          className={`h-5 w-5 mr-2 flex-shrink-0 ${
+                            plan.popular ? "text-blue-500" : "text-green-500"
+                          }`}
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -261,7 +251,7 @@ export default function PricingPage() {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span>{feature}</span>
+                        <span className="text-gray-700 text-sm">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -271,8 +261,12 @@ export default function PricingPage() {
                   <Button
                     onClick={() => handleSubscribe(plan.priceId)}
                     disabled={isLoading || isActive || plan.priceId === "free"}
-                    className={`w-full h-12 ${
-                      plan.popular ? "bg-blue-600 hover:bg-blue-700" : ""
+                    className={`w-full h-11 ${
+                      plan.id === "free"
+                        ? "bg-gray-600 hover:bg-gray-700"
+                        : plan.popular
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-600 hover:bg-blue-700"
                     } ${
                       isActive ? "bg-green-600 hover:bg-green-600" : ""
                     } text-white`}
@@ -287,15 +281,33 @@ export default function PricingPage() {
         })}
       </div>
 
-      <div className="mt-16 text-center">
-        <h3 className="text-2xl font-semibold mb-4">Need a custom plan?</h3>
-        <p className="text-muted-foreground mb-6">
-          For enterprises or teams with specific requirements, we offer custom
-          solutions.
+      {/* <div className="mt-16 text-center bg-gray-50 p-8 rounded-lg border border-gray-200 shadow-sm max-w-3xl mx-auto">
+        <h3 className="text-xl font-semibold mb-3 text-gray-800">
+          Need a custom plan?
+        </h3>
+        <p className="text-gray-600 mb-6">
+          For enterprises or teams with specific needs, we offer tailored
+          solutions to fit your requirements.
         </p>
-        <Button variant="outline" className="h-12 px-8">
+        <Button
+          variant="outline"
+          className="h-11 px-8 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+        >
           Contact Us
         </Button>
+      </div> */}
+
+      <div className="mt-12 text-center text-gray-500 text-sm">
+        <p>All plans include automatic monthly billing. Cancel anytime.</p>
+        <p className="mt-2">
+          Questions? Contact{" "}
+          <a
+            href="mailto:support@formsense.app"
+            className="text-blue-600 hover:underline"
+          >
+            support@formsense.app
+          </a>
+        </p>
       </div>
     </div>
   );

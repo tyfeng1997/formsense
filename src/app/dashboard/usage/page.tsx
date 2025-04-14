@@ -43,7 +43,7 @@ const PLAN_NAMES: { [key: string]: string } = {
 // Plan color mapping
 const PLAN_COLORS: { [key: string]: string } = {
   pri_01jrnh4z3hmr6zm4e6tf8fxg4x: "bg-blue-500",
-  pri_01jrnh5sqd8kqmfe6jzf0sd6n0: "bg-purple-500",
+  pri_01jrnh5sqd8kqmfe6jzf0sd6n0: "bg-blue-600",
   default: "bg-gray-500",
 };
 
@@ -187,12 +187,32 @@ export default function UsagePage() {
     <div className="container py-10 max-w-5xl mx-auto">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Usage Statistics</h1>
-          <p className="text-muted-foreground mt-1">
-            Track and manage your API usage and limits
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            Usage Statistics
+          </h1>
+          <p className="text-gray-500 mt-2 ml-8">
+            Track and manage your document processing limits
           </p>
         </div>
-        <Button asChild variant="outline" className="w-full md:w-auto">
+        <Button
+          asChild
+          variant="outline"
+          className="w-full md:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+        >
           <Link href="/dashboard/pricing">
             <Package className="mr-2 h-4 w-4" />
             View Pricing Plans
@@ -214,7 +234,7 @@ export default function UsagePage() {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
           <div className="mt-4">
-            <Button asChild>
+            <Button asChild className="bg-blue-600 hover:bg-blue-700">
               <Link href="/dashboard">Return to Dashboard</Link>
             </Button>
           </div>
@@ -222,7 +242,7 @@ export default function UsagePage() {
       ) : (
         <div className="space-y-8">
           {/* Current plan overview */}
-          <Card className="overflow-hidden border-t-4 border-primary shadow-md">
+          <Card className="overflow-hidden border border-gray-200 shadow-sm">
             <div
               className={`h-1.5 w-full ${
                 subscription
@@ -230,11 +250,13 @@ export default function UsagePage() {
                   : "bg-blue-500"
               }`}
             ></div>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 bg-gray-50 border-b border-gray-200">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                  <CardTitle className="text-2xl">Your Current Plan</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-xl text-gray-800">
+                    Current Usage
+                  </CardTitle>
+                  <CardDescription className="text-gray-500">
                     {subscription
                       ? `You're on the ${
                           PLAN_NAMES[subscription.price_id] || "Standard"
@@ -259,21 +281,21 @@ export default function UsagePage() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="pb-0">
+            <CardContent className="p-6">
               {usage ? (
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between items-end mb-2">
                       <div>
-                        <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                          API Usage This Month
+                        <h3 className="text-sm font-medium text-gray-500 mb-1">
+                          Document Processing Usage This Month
                         </h3>
                         <div className="flex items-center gap-2">
-                          <span className="text-2xl font-bold">
+                          <span className="text-2xl font-bold text-gray-900">
                             {usage.usage_count}
                           </span>
-                          <span className="text-muted-foreground">
-                            of {limit} requests
+                          <span className="text-gray-500">
+                            of {limit} documents
                           </span>
                         </div>
                       </div>
@@ -297,39 +319,43 @@ export default function UsagePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4">
-                    <Card className="bg-muted/30 border shadow-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                    <Card className="bg-gray-50 border border-gray-200 shadow-sm">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="rounded-full bg-primary/10 p-2">
-                            <Calendar className="h-5 w-5 text-primary" />
+                          <div className="rounded-full bg-blue-100 p-2">
+                            <Calendar className="h-5 w-5 text-blue-600" />
                           </div>
-                          <h3 className="font-medium">Reset Date</h3>
+                          <h3 className="font-medium text-gray-800">
+                            Reset Date
+                          </h3>
                         </div>
-                        <p className="text-lg font-semibold">
+                        <p className="text-lg font-semibold text-gray-900">
                           {formatDate(usage.reset_date)}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                           {calculateRemainingDays(usage.reset_date)} days until
                           reset
                         </p>
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-muted/30 border shadow-sm">
+                    <Card className="bg-gray-50 border border-gray-200 shadow-sm">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="rounded-full bg-primary/10 p-2">
-                            <BarChart3 className="h-5 w-5 text-primary" />
+                          <div className="rounded-full bg-blue-100 p-2">
+                            <BarChart3 className="h-5 w-5 text-blue-600" />
                           </div>
-                          <h3 className="font-medium">Remaining Requests</h3>
+                          <h3 className="font-medium text-gray-800">
+                            Remaining Documents
+                          </h3>
                         </div>
-                        <p className="text-lg font-semibold">
+                        <p className="text-lg font-semibold text-gray-900">
                           {limit - usage.usage_count > 0
-                            ? `${limit - usage.usage_count} requests remaining`
+                            ? `${limit - usage.usage_count} documents remaining`
                             : "Monthly limit reached"}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                           {limit - usage.usage_count > 0
                             ? `You've used ${usagePercentage}% of your limit`
                             : "Consider upgrading your plan"}
@@ -340,14 +366,14 @@ export default function UsagePage() {
                 </div>
               ) : (
                 <div className="text-center py-8 px-4">
-                  <div className="rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="h-6 w-6 text-primary" />
+                  <div className="rounded-full bg-blue-100 w-12 h-12 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="h-6 w-6 text-blue-600" />
                   </div>
-                  <h3 className="text-xl font-medium mb-2">
+                  <h3 className="text-xl font-medium mb-2 text-gray-800">
                     No Usage Records Yet
                   </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Start using the API to see your usage statistics here
+                  <p className="text-gray-500 mb-4">
+                    Start processing documents to see your usage statistics here
                   </p>
                 </div>
               )}
@@ -356,15 +382,17 @@ export default function UsagePage() {
             {/* Show only if not on Pro plan */}
             {(!subscription ||
               subscription.price_id !== "pri_01jrnh5sqd8kqmfe6jzf0sd6n0") && (
-              <CardFooter className="bg-muted/30 p-6 mt-6">
+              <CardFooter className="bg-gray-50 p-6 mt-2 border-t border-gray-200">
                 <div className="w-full">
                   <div className="flex items-center gap-2 mb-3">
-                    <Zap className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">Need More Requests?</h3>
+                    <Zap className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-medium text-gray-800">
+                      Need More Processing Capacity?
+                    </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Upgrade your plan to get additional API requests and premium
-                    features
+                  <p className="text-sm text-gray-500 mb-4">
+                    Upgrade your plan to process more documents and access
+                    premium features
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     {subscription?.price_id !==
@@ -372,7 +400,7 @@ export default function UsagePage() {
                       <Button
                         asChild
                         variant="outline"
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
                       >
                         <Link href="/dashboard/pricing">
                           Upgrade to Basic
@@ -380,7 +408,10 @@ export default function UsagePage() {
                         </Link>
                       </Button>
                     )}
-                    <Button asChild className="w-full sm:w-auto">
+                    <Button
+                      asChild
+                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+                    >
                       <Link href="/dashboard/pricing">
                         Upgrade to Pro
                         <ArrowUpRight className="ml-2 h-4 w-4" />
@@ -392,165 +423,50 @@ export default function UsagePage() {
             )}
           </Card>
 
-          {/* Plan comparison */}
-          <Card className="shadow-md overflow-hidden">
-            <CardHeader className="bg-muted/40">
-              <CardTitle>Plan Comparison</CardTitle>
-              <CardDescription>
-                Compare usage limits across different plans
+          {/* Usage history visualization could go here */}
+          <Card className="border border-gray-200 shadow-sm overflow-hidden">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="text-xl text-gray-800 flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
+                Processing History
+              </CardTitle>
+              <CardDescription className="text-gray-500">
+                Overview of your document processing activity
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Free Plan */}
-                <div className="rounded-lg border p-4 flex flex-col h-full">
-                  <div className="mb-2">
-                    <Badge variant="outline" className="mb-2">
-                      Free
-                    </Badge>
-                    <h3 className="text-lg font-semibold">Free Plan</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Basic functionality
-                    </p>
-                  </div>
-                  <div className="flex items-baseline mt-3 mb-4">
-                    <span className="text-3xl font-bold">50</span>
-                    <span className="text-muted-foreground ml-1">
-                      requests/month
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      subscription?.price_id
-                        ? 0
-                        : usage
-                        ? (usage.usage_count / 50) * 100
-                        : 0
-                    }
-                    className="h-2 mb-4"
-                  />
-                  <ul className="text-sm space-y-2 flex-grow">
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Basic document processing</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Limited template use</span>
-                    </li>
-                  </ul>
-                  {!subscription && (
-                    <Badge variant="secondary" className="mt-4 w-fit">
-                      Current Plan
-                    </Badge>
-                  )}
+              <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                <div className="rounded-full bg-blue-100 w-12 h-12 flex items-center justify-center mb-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
                 </div>
-
-                {/* Basic Plan */}
-                <div
-                  className={`rounded-lg border p-4 flex flex-col h-full ${
-                    subscription?.price_id === "pri_01jrnh4z3hmr6zm4e6tf8fxg4x"
-                      ? "border-blue-500 shadow-md"
-                      : ""
-                  }`}
+                <h3 className="text-xl font-medium mb-2 text-gray-800">
+                  Coming Soon
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-md">
+                  Detailed processing history and analytics will be available in
+                  a future update. Stay tuned for more insights about your
+                  document processing!
+                </p>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
                 >
-                  <div className="mb-2">
-                    <Badge variant="secondary" className="mb-2">
-                      Basic
-                    </Badge>
-                    <h3 className="text-lg font-semibold">Basic Plan</h3>
-                    <p className="text-sm text-muted-foreground">
-                      For individuals & small teams
-                    </p>
-                  </div>
-                  <div className="flex items-baseline mt-3 mb-4">
-                    <span className="text-3xl font-bold">500</span>
-                    <span className="text-muted-foreground ml-1">
-                      requests/month
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      subscription?.price_id ===
-                        "pri_01jrnh4z3hmr6zm4e6tf8fxg4x" && usage
-                        ? (usage.usage_count / 500) * 100
-                        : 0
-                    }
-                    className="h-2 mb-4"
-                  />
-                  <ul className="text-sm space-y-2 flex-grow">
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>All core features</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Template creation</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Export to CSV/Excel</span>
-                    </li>
-                  </ul>
-                  {subscription?.price_id ===
-                    "pri_01jrnh4z3hmr6zm4e6tf8fxg4x" && (
-                    <Badge variant="secondary" className="mt-4 w-fit">
-                      Current Plan
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Pro Plan */}
-                <div
-                  className={`rounded-lg border p-4 flex flex-col h-full ${
-                    subscription?.price_id === "pri_01jrnh5sqd8kqmfe6jzf0sd6n0"
-                      ? "border-purple-500 shadow-md"
-                      : ""
-                  }`}
-                >
-                  <div className="mb-2">
-                    <Badge className="mb-2">Pro</Badge>
-                    <h3 className="text-lg font-semibold">Pro Plan</h3>
-                    <p className="text-sm text-muted-foreground">
-                      For growing businesses
-                    </p>
-                  </div>
-                  <div className="flex items-baseline mt-3 mb-4">
-                    <span className="text-3xl font-bold">1,500</span>
-                    <span className="text-muted-foreground ml-1">
-                      requests/month
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      subscription?.price_id ===
-                        "pri_01jrnh5sqd8kqmfe6jzf0sd6n0" && usage
-                        ? (usage.usage_count / 1500) * 100
-                        : 0
-                    }
-                    className="h-2 mb-4"
-                  />
-                  <ul className="text-sm space-y-2 flex-grow">
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>All Basic features</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Advanced template management</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
-                      <span>Priority support</span>
-                    </li>
-                  </ul>
-                  {subscription?.price_id ===
-                    "pri_01jrnh5sqd8kqmfe6jzf0sd6n0" && (
-                    <Badge variant="default" className="mt-4 w-fit">
-                      Current Plan
-                    </Badge>
-                  )}
-                </div>
+                  <Link href="/dashboard">Return to Dashboard</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
