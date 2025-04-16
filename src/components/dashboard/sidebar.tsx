@@ -202,10 +202,6 @@ export function Sidebar({ user }: SidebarProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
-          <div className="text-xs text-gray-500 px-2">
-            <p>FormSense Alpha Version</p>
-          </div>
         </div>
       </aside>
     </>

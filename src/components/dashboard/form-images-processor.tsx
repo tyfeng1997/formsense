@@ -399,7 +399,7 @@ export function FormImagesProcessor() {
                 Drag and drop image files or click to browse
               </p>
               <p className="text-sm text-gray-500">
-                Supported formats: PNG, JPG, JPEG, GIF, WEBP, etc. (all will be
+                Supported formats: PNG, JPG, JPEG, WEBP, etc. (all will be
                 converted to JPEG)
               </p>
             </div>
