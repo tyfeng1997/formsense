@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, CheckCircle2, Download, Save, Edit, X } from "lucide-react";
+import {
+  Copy,
+  CheckCircle2,
+  Download,
+  Save,
+  Edit,
+  X,
+  FileSpreadsheet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -14,6 +22,12 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Template = {
   id: string;
@@ -49,6 +63,7 @@ export function ExtractedResults({
     fieldName: string;
   } | null>(null);
   const [editingValue, setEditingValue] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Get field names from results if using all fields extraction
   // Otherwise, use the template fields
@@ -105,6 +120,78 @@ export function ExtractedResults({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Handler for exporting to Excel
+  const handleExportExcel = async () => {
+    if (!results.length) return;
+
+    setIsExporting(true);
+
+    try {
+      // Dynamic import of xlsx library
+      const XLSX = await import("xlsx");
+
+      const fields = fieldNames;
+      const headers = ["Image Name", ...fields];
+
+      // Prepare data for Excel
+      const excelData = [
+        headers,
+        ...results.map((result) => {
+          return [
+            result.imageName,
+            ...fields.map((field) => result.fields[field] || "N/A"),
+          ];
+        }),
+      ];
+
+      // Create a worksheet
+      const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+      // Style the header row (bold)
+      for (let i = 0; i < headers.length; i++) {
+        const cellRef = XLSX.utils.encode_cell({ r: 0, c: i });
+        if (!ws[cellRef]) ws[cellRef] = {};
+        ws[cellRef].s = { font: { bold: true } };
+      }
+
+      // Set column widths (auto-size based on content)
+      const colWidths = headers.map((h, i) => {
+        // Start with header width
+        let maxWidth = h.length;
+
+        // Check all rows for this column
+        results.forEach((result) => {
+          const content =
+            i === 0 ? result.imageName : result.fields[fields[i - 1]] || "N/A";
+          if (content.length > maxWidth) maxWidth = content.length;
+        });
+
+        // Add some padding and convert to Excel width
+        return { wch: maxWidth + 2 };
+      });
+
+      ws["!cols"] = colWidths;
+
+      // Create a workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Extraction Results");
+
+      // Generate file name
+      const fileName = isAllFieldsExtraction
+        ? `all_fields_extraction_${new Date().toISOString().split("T")[0]}.xlsx`
+        : `${template?.name || "extraction"}_${
+            new Date().toISOString().split("T")[0]
+          }.xlsx`;
+
+      // Write the file and trigger download
+      XLSX.writeFile(wb, fileName);
+    } catch (error) {
+      console.error("Excel export error:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // Start editing a cell
@@ -189,15 +276,38 @@ export function ExtractedResults({
           </TabsList>
         </Tabs>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExportCSV}
-          className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              <span>CSV Format (.csv)</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportExcel}>
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              <span>Excel Format (.xlsx)</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {isAllFieldsExtraction && (
