@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, CheckCircle2, Download, Save, Edit, X } from "lucide-react";
+import {
+  Copy,
+  CheckCircle2,
+  Download,
+  Save,
+  Edit,
+  X,
+  FileSpreadsheet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -14,6 +22,12 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Template = {
   id: string;
@@ -25,17 +39,21 @@ type ExtractionResult = {
   imageId: string;
   imageName: string;
   fields: Record<string, string>;
+  error?: string;
+  isAllFieldsExtraction?: boolean; // Flag for all fields extraction
 };
 
 type ExtractedResultsProps = {
   results: ExtractionResult[];
   template: Template | null;
+  isAllFieldsExtraction?: boolean; // Flag indicating if this is all fields extraction
   onUpdateResults?: (results: ExtractionResult[]) => void;
 };
 
 export function ExtractedResults({
   results,
   template,
+  isAllFieldsExtraction = false,
   onUpdateResults,
 }: ExtractedResultsProps) {
   const [activeTab, setActiveTab] = useState("table");
@@ -45,6 +63,25 @@ export function ExtractedResults({
     fieldName: string;
   } | null>(null);
   const [editingValue, setEditingValue] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Get field names from results if using all fields extraction
+  // Otherwise, use the template fields
+  const getFieldNames = (): string[] => {
+    if (isAllFieldsExtraction && results.length > 0) {
+      // Collect all unique field names from all results
+      const fieldNames = new Set<string>();
+      results.forEach((result) => {
+        Object.keys(result.fields).forEach((field) => fieldNames.add(field));
+      });
+      return Array.from(fieldNames);
+    } else if (template?.fields) {
+      return template.fields.map((f) => f.name);
+    }
+    return [];
+  };
+
+  const fieldNames = getFieldNames();
 
   // Handler for copying field content
   const handleCopyField = (text: string, fieldId: string) => {
@@ -55,9 +92,9 @@ export function ExtractedResults({
 
   // Handler for exporting to CSV
   const handleExportCSV = () => {
-    if (!results.length || !template) return;
+    if (!results.length) return;
 
-    const fields = template.fields.map((f) => f.name);
+    const fields = fieldNames;
     const headers = ["Image Name", ...fields];
 
     const csvContent = [
@@ -78,13 +115,83 @@ export function ExtractedResults({
     link.href = url;
     link.setAttribute(
       "download",
-      `${template.name}_extraction_${
-        new Date().toISOString().split("T")[0]
-      }.csv`
+      `extraction_${new Date().toISOString().split("T")[0]}.csv`
     );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Handler for exporting to Excel
+  const handleExportExcel = async () => {
+    if (!results.length) return;
+
+    setIsExporting(true);
+
+    try {
+      // Dynamic import of xlsx library
+      const XLSX = await import("xlsx");
+
+      const fields = fieldNames;
+      const headers = ["Image Name", ...fields];
+
+      // Prepare data for Excel
+      const excelData = [
+        headers,
+        ...results.map((result) => {
+          return [
+            result.imageName,
+            ...fields.map((field) => result.fields[field] || "N/A"),
+          ];
+        }),
+      ];
+
+      // Create a worksheet
+      const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+      // Style the header row (bold)
+      for (let i = 0; i < headers.length; i++) {
+        const cellRef = XLSX.utils.encode_cell({ r: 0, c: i });
+        if (!ws[cellRef]) ws[cellRef] = {};
+        ws[cellRef].s = { font: { bold: true } };
+      }
+
+      // Set column widths (auto-size based on content)
+      const colWidths = headers.map((h, i) => {
+        // Start with header width
+        let maxWidth = h.length;
+
+        // Check all rows for this column
+        results.forEach((result) => {
+          const content =
+            i === 0 ? result.imageName : result.fields[fields[i - 1]] || "N/A";
+          if (content.length > maxWidth) maxWidth = content.length;
+        });
+
+        // Add some padding and convert to Excel width
+        return { wch: maxWidth + 2 };
+      });
+
+      ws["!cols"] = colWidths;
+
+      // Create a workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Extraction Results");
+
+      // Generate file name
+      const fileName = isAllFieldsExtraction
+        ? `all_fields_extraction_${new Date().toISOString().split("T")[0]}.xlsx`
+        : `${template?.name || "extraction"}_${
+            new Date().toISOString().split("T")[0]
+          }.xlsx`;
+
+      // Write the file and trigger download
+      XLSX.writeFile(wb, fileName);
+    } catch (error) {
+      console.error("Excel export error:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // Start editing a cell
@@ -169,32 +276,64 @@ export function ExtractedResults({
           </TabsList>
         </Tabs>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExportCSV}
-          className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              <span>CSV Format (.csv)</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportExcel}>
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              <span>Excel Format (.xlsx)</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {isAllFieldsExtraction && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-3 text-green-700 text-sm">
+          <p>
+            All fields detected automatically. The AI has identified{" "}
+            {fieldNames.length} fields from your forms.
+          </p>
+        </div>
+      )}
 
       <Tabs value={activeTab} className="w-full">
         <TabsContent value="table" className="mt-0">
-          <div className="border rounded-md overflow-hidden shadow-sm">
+          <div className="border rounded-md overflow-auto shadow-sm">
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow className="hover:bg-gray-50">
                   <TableHead className="w-[200px] font-medium text-gray-700">
                     Image
                   </TableHead>
-                  {template?.fields.map((field) => (
+                  {fieldNames.map((fieldName) => (
                     <TableHead
-                      key={field.name}
+                      key={fieldName}
                       className="font-medium text-gray-700"
                     >
-                      {field.name}
+                      {fieldName}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -208,10 +347,10 @@ export function ExtractedResults({
                     <TableCell className="font-medium text-gray-800">
                       {result.imageName}
                     </TableCell>
-                    {template?.fields.map((field) => (
-                      <TableCell key={field.name} className="relative">
+                    {fieldNames.map((fieldName) => (
+                      <TableCell key={fieldName} className="relative">
                         {editingCell?.resultId === result.imageId &&
-                        editingCell?.fieldName === field.name ? (
+                        editingCell?.fieldName === fieldName ? (
                           <div className="flex items-center">
                             <Input
                               value={editingValue}
@@ -242,7 +381,7 @@ export function ExtractedResults({
                         ) : (
                           <div className="flex items-center justify-between group">
                             <span className="text-gray-700">
-                              {result.fields[field.name] || "N/A"}
+                              {result.fields[fieldName] || "N/A"}
                             </span>
                             <div className="flex items-center invisible group-hover:visible">
                               <button
@@ -253,8 +392,8 @@ export function ExtractedResults({
                                 onClick={() =>
                                   startEditing(
                                     result.imageId,
-                                    field.name,
-                                    result.fields[field.name] || ""
+                                    fieldName,
+                                    result.fields[fieldName] || ""
                                   )
                                 }
                               >
@@ -264,13 +403,13 @@ export function ExtractedResults({
                                 className="p-1 rounded-full hover:bg-blue-100 hover:text-blue-600"
                                 onClick={() =>
                                   handleCopyField(
-                                    result.fields[field.name] || "",
-                                    `${result.imageId}-${field.name}`
+                                    result.fields[fieldName] || "",
+                                    `${result.imageId}-${fieldName}`
                                   )
                                 }
                               >
                                 {copiedField ===
-                                `${result.imageId}-${field.name}` ? (
+                                `${result.imageId}-${fieldName}` ? (
                                   <CheckCircle2 className="h-3 w-3 text-green-500" />
                                 ) : (
                                   <Copy className="h-3 w-3 text-gray-500" />

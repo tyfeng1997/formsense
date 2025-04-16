@@ -10,6 +10,7 @@ import {
   FileText,
   Plus,
   Save,
+  Scan,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,7 @@ type ExtractionResult = {
     fileType: string;
   };
   error?: string;
+  isAllFieldsExtraction?: boolean;
 };
 
 export function FormImagesProcessor() {
@@ -62,6 +64,7 @@ export function FormImagesProcessor() {
     useState(false);
   const [results, setResults] = useState<ExtractionResult[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isAllFieldsExtraction, setIsAllFieldsExtraction] = useState(false);
 
   // Progress tracking for batch processing
   const [processedCount, setProcessedCount] = useState(0);
@@ -208,6 +211,119 @@ export function FormImagesProcessor() {
     }
   };
 
+  const handleExtractAllFields = async () => {
+    // Get selected images
+    const selectedImages = images.filter((img) => img.selected);
+
+    if (selectedImages.length === 0) {
+      toast.error("No images selected", {
+        description: "Please select at least one image to extract data from.",
+      });
+      return;
+    }
+
+    setIsExtracting(true);
+    setShowExtractionDialog(false);
+    setIsAllFieldsExtraction(true); // Set this flag to true
+
+    // Reset progress tracking
+    setProcessedCount(0);
+    setTotalToProcess(selectedImages.length);
+    setExtractionProgress(0);
+    setResults([]);
+
+    // Show loading toast
+    const toastId = toast.loading(
+      `Extracting all fields from ${selectedImages.length} image${
+        selectedImages.length > 1 ? "s" : ""
+      }...`
+    );
+
+    try {
+      // Process images one by one to show progress
+      const newResults: ExtractionResult[] = [];
+
+      for (let i = 0; i < selectedImages.length; i++) {
+        const image = selectedImages[i];
+
+        // Create FormData for this single image
+        const formData = new FormData();
+        formData.append("template", "all_fields"); // Special value to indicate all fields extraction
+        formData.append(`image_${image.id}`, image.file);
+
+        try {
+          // Send extraction request for this single image
+          const response = await fetch("/api/extract", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `API request failed with status: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          // Add the result to our collection
+          if (data.results && data.results.length > 0) {
+            newResults.push({
+              ...data.results[0],
+              isAllFieldsExtraction: true,
+            });
+          }
+        } catch (error) {
+          console.error(`Error processing image ${image.name}:`, error);
+
+          // Add a failed result
+          newResults.push({
+            imageId: image.id,
+            imageName: image.name,
+            fields: { Error: "Failed to extract fields" },
+            error: error instanceof Error ? error.message : "Unknown error",
+            isAllFieldsExtraction: true,
+          });
+        }
+
+        // Update progress
+        setProcessedCount(i + 1);
+        setExtractionProgress(
+          Math.round(((i + 1) / selectedImages.length) * 100)
+        );
+
+        // Update results as they come in
+        setResults([...newResults]);
+      }
+
+      // Success toast
+      toast.success(
+        `Successfully extracted all fields from ${selectedImages.length} image${
+          selectedImages.length > 1 ? "s" : ""
+        }.`,
+        {
+          id: toastId,
+          description: "You can now view and edit the results.",
+        }
+      );
+    } catch (error) {
+      console.error("Extraction error:", error);
+
+      // Update loading status to failed
+      toast.error("Failed to extract data", {
+        id: toastId,
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const handleExtractWithTemplate = async (template: Template) => {
     if (!template) {
       toast.error("No template selected", {
@@ -228,6 +344,7 @@ export function FormImagesProcessor() {
 
     setIsExtracting(true);
     setShowExtractionDialog(false);
+    setIsAllFieldsExtraction(false); // Reset all fields mode
 
     // Reset progress tracking
     setProcessedCount(0);
@@ -399,7 +516,7 @@ export function FormImagesProcessor() {
                 Drag and drop image files or click to browse
               </p>
               <p className="text-sm text-gray-500">
-                Supported formats: PNG, JPG, JPEG, GIF, WEBP, etc. (all will be
+                Supported formats: PNG, JPG, JPEG, WEBP, etc. (all will be
                 converted to JPEG)
               </p>
             </div>
@@ -508,7 +625,33 @@ export function FormImagesProcessor() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            {selectedTemplate ? (
+            {isAllFieldsExtraction ? (
+              <div className="flex items-center justify-between p-4 bg-green-50 rounded-md border border-green-200">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-green-100 text-green-600">
+                    <Scan className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-green-800">
+                      Extract All Fields (Auto-detect)
+                    </h3>
+                    <p className="text-sm text-green-700">
+                      Automatically detecting and extracting all fields from
+                      your forms
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowTemplateSelectionDialog(true)}
+                  className="border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300"
+                >
+                  Change Template
+                </Button>
+              </div>
+            ) : selectedTemplate ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -606,7 +749,6 @@ export function FormImagesProcessor() {
                 <Progress
                   value={extractionProgress}
                   className="h-2 bg-gray-100"
-                  // indicatorClassName="bg-blue-600"
                 />
                 <p className="text-xs text-center text-gray-500">
                   Processing image {processedCount} of {totalToProcess}
@@ -625,6 +767,7 @@ export function FormImagesProcessor() {
                   <ExtractedResults
                     results={results}
                     template={selectedTemplate}
+                    isAllFieldsExtraction={isAllFieldsExtraction}
                     onUpdateResults={handleUpdateResults}
                   />
                 </div>
@@ -634,6 +777,7 @@ export function FormImagesProcessor() {
             <ExtractedResults
               results={results}
               template={selectedTemplate}
+              isAllFieldsExtraction={isAllFieldsExtraction}
               onUpdateResults={handleUpdateResults}
             />
           ) : (
@@ -659,6 +803,7 @@ export function FormImagesProcessor() {
         open={showExtractionDialog}
         onClose={() => setShowExtractionDialog(false)}
         onSelectTemplate={handleExtractWithTemplate}
+        onExtractAllFields={handleExtractAllFields}
         onCreateTemplate={handleCreateTemplate}
         currentTemplateId={selectedTemplate?.id}
       />
@@ -669,10 +814,12 @@ export function FormImagesProcessor() {
         onClose={() => setShowTemplateSelectionDialog(false)}
         onSelectTemplate={(template) => {
           selectTemplate(template.id);
+          setIsAllFieldsExtraction(false);
           toast.info(`Template selected: ${template.name}`, {
             description: `${template.fields.length} fields will be used for extraction.`,
           });
         }}
+        onExtractAllFields={handleExtractAllFields}
         onCreateTemplate={handleCreateTemplate}
         currentTemplateId={selectedTemplate?.id}
       />

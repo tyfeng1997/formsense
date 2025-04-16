@@ -22,16 +22,6 @@ export default function TemplatesPage() {
   return (
     <div className="space-y-6 py-6 px-2">
       <div className="flex items-center gap-4 mb-6 border-b border-gray-200 pb-4">
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-blue-50 hover:text-blue-600"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <svg
