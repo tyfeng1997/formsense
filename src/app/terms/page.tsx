@@ -226,15 +226,73 @@ export default function TermsOfService() {
                 unless you cancel before the trial ends.
               </p>
 
-              <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">
-                6.3 Cancellation and Refunds
+              <h3
+                id="refund"
+                className="text-lg font-medium text-gray-800 mt-4 mb-2"
+              >
+                6.3 Cancellation and Refund Policy
               </h3>
               <p>
                 You may cancel your subscription at any time through your
-                account settings or by contacting us. Upon cancellation, your
-                subscription will remain active until the end of your current
-                billing period. We do not provide refunds for partial
-                subscription periods.
+                account settings or by contacting our support team at{" "}
+                <a
+                  href="mailto:support@formsense.app"
+                  className="text-blue-600 hover:underline"
+                >
+                  support@formsense.app
+                </a>
+                . Upon cancellation, your subscription will remain active until
+                the end of your current billing period.
+              </p>
+              <p className="mt-2">
+                <strong>Standard Refund Policy:</strong> We generally do not
+                provide refunds for partial subscription periods. When you
+                cancel your subscription, you will continue to have access to
+                the Service until the end of your current billing cycle, but you
+                will not be charged for subsequent billing cycles.
+              </p>
+              <p className="mt-2">
+                <strong>Exceptional Circumstances:</strong> In the following
+                cases, you may be eligible for a full or partial refund:
+              </p>
+              <ul className="list-disc pl-6 mt-2 mb-4">
+                <li>
+                  <strong>Technical Issues:</strong> If you experience severe
+                  technical issues that prevent you from using core features of
+                  the Service, and our support team is unable to resolve these
+                  issues within 7 business days of your initial report.
+                </li>
+                <li>
+                  <strong>Billing Errors:</strong> If you have been charged
+                  incorrectly or multiple times for the same subscription
+                  period.
+                </li>
+                <li>
+                  <strong>New Subscribers:</strong> If you are a new subscriber
+                  and request a refund within 7 days of your initial payment,
+                  provided you have processed fewer than 50 documents during
+                  this period.
+                </li>
+              </ul>
+              <p className="mt-2">
+                <strong>Refund Requests:</strong> To request a refund, please
+                contact our support team at{" "}
+                <a
+                  href="mailto:support@formsense.app"
+                  className="text-blue-600 hover:underline"
+                >
+                  support@formsense.app
+                </a>{" "}
+                with your account details and reason for the refund request. All
+                refund requests are evaluated on a case-by-case basis, and we
+                reserve the right to deny refund requests that do not meet our
+                criteria.
+              </p>
+              <p className="mt-2">
+                <strong>Refund Processing:</strong> Approved refunds will be
+                processed using the original payment method used for the
+                purchase. Refunds may take 5-10 business days to appear on your
+                statement, depending on your payment provider.
               </p>
 
               <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">

@@ -51,9 +51,9 @@ export default async function Home() {
           <a href="#how-it-works" className="text-gray-600 hover:text-blue-600">
             How It Works
           </a>
-          <a href="#pricing" className="text-gray-600 hover:text-blue-600">
+          <Link href="/pricing" className="text-gray-600 hover:text-blue-600">
             Pricing
-          </a>
+          </Link>
           <Link
             href="https://x.com/bofeng1997"
             className="flex items-center text-gray-600 hover:text-blue-600"
@@ -488,9 +488,9 @@ export default async function Home() {
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-white">
+                <Link href="/pricing" className="hover:text-white">
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="#how-it-works" className="hover:text-white">
@@ -520,14 +520,19 @@ export default async function Home() {
             <h4 className="text-white font-medium mb-3">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="hover:text-white">
+                <Link href="/privacy" className="hover:text-white">
                   Privacy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <Link href="/terms" className="hover:text-white">
                   Terms
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms#refund" className="hover:text-white">
+                  Refund Policy
+                </Link>
               </li>
             </ul>
           </div>

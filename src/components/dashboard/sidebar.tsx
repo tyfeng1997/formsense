@@ -149,11 +149,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
 
           {/* Add three new navigation items */}
-          <NavItem
-            href="/dashboard/pricing"
-            icon={CreditCard}
-            label="Pricing Plans"
-          />
+          <NavItem href="/pricing" icon={CreditCard} label="Pricing Plans" />
           <NavItem
             href="/dashboard/usage"
             icon={BarChart2}
