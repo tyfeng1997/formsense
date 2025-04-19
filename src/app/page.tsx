@@ -1,4 +1,4 @@
-// src/app/page.tsx
+import Image from "next/image";
 import Link from "next/link";
 import { BsTwitterX } from "react-icons/bs";
 import { FaRegLightbulb } from "react-icons/fa";
@@ -78,7 +78,7 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Simplified */}
+      {/* Hero Section */}
       <section className="py-16 px-8 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
@@ -105,71 +105,157 @@ export default async function Home() {
               </a>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">
-              Transform Your Document Processing
-            </h3>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Process hundreds of documents at once
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Extract specific fields or entire forms
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Export to CSV, Excel, or JSON
-                </span>
-              </li>
-            </ul>
+          <div className="relative">
+            <Image
+              src="/form-to-excel.jpg"
+              alt="Extract form fields to Excel"
+              width={600}
+              height={500}
+              className="rounded-lg shadow-lg"
+            />
           </div>
         </div>
       </section>
 
-      {/* Features Section - Redesigned */}
+      {/* Product Showcase */}
+      <section className="py-12 px-8 bg-white">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Transform Your Document Processing
+          </h2>
+          <div className="mb-10">
+            <Image
+              src="/app-dashboard.jpg"
+              alt="FormSense - Application Dashboard"
+              width={1000}
+              height={600}
+              className="mx-auto rounded-lg shadow-xl border border-gray-200"
+            />
+          </div>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            Our intuitive interface makes it easy to upload form images, extract
+            data using templates, and export the results to Excel with just a
+            few clicks.
+          </p>
+        </div>
+      </section>
+
+      {/* How It Works Section - NEW */}
+      <section id="how-it-works" className="py-16 px-8 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            How It Works
+          </h2>
+
+          <div className="space-y-16">
+            {/* Step 1 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="order-2 md:order-1">
+                <div className="bg-blue-600 text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center mb-4">
+                  1
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">
+                  Create an Extraction Template
+                </h3>
+                <p className="text-gray-600">
+                  Select fields you want to extract from your document. Define
+                  the layout once, and FormSense will recognize similar
+                  documents automatically. Our AI helps identify field types for
+                  better accuracy.
+                </p>
+              </div>
+              <div className="order-1 md:order-2">
+                <Image
+                  src="/step1-create-template.jpg"
+                  alt="Creating an extraction template"
+                  width={500}
+                  height={300}
+                  className="rounded-lg shadow-md border border-gray-200"
+                />
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <Image
+                  src="/step2-upload-images.jpg"
+                  alt="Upload images and select template"
+                  width={500}
+                  height={300}
+                  className="rounded-lg shadow-md border border-gray-200"
+                />
+              </div>
+              <div>
+                <div className="bg-blue-600 text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center mb-4">
+                  2
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">
+                  Upload Images & Select Template
+                </h3>
+                <p className="text-gray-600">
+                  Upload a single document or batch process hundreds at once.
+                  Select your previously created template, or let our system
+                  auto-detect the appropriate template for mixed document types.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="order-2 md:order-1">
+                <div className="bg-blue-600 text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center mb-4">
+                  3
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">Extract Data</h3>
+                <p className="text-gray-600">
+                  Our AI processes your documents and extracts the requested
+                  data with high accuracy. Review the extraction results
+                  directly in the app and make any necessary adjustments before
+                  finalizing.
+                </p>
+              </div>
+              <div className="order-1 md:order-2">
+                <Image
+                  src="/step3-extract.jpg"
+                  alt="Extract data from images"
+                  width={500}
+                  height={300}
+                  className="rounded-lg shadow-md border border-gray-200"
+                />
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <Image
+                  src="/step4-export-excel.jpg"
+                  alt="Export to Excel"
+                  width={500}
+                  height={300}
+                  className="rounded-lg shadow-md border border-gray-200"
+                />
+              </div>
+              <div>
+                <div className="bg-blue-600 text-white text-lg font-bold w-10 h-10 rounded-full flex items-center justify-center mb-4">
+                  4
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">
+                  Export to Excel & Other Formats
+                </h3>
+                <p className="text-gray-600">
+                  Download your structured data in Excel, CSV, or JSON format.
+                  All your data is organized exactly how you need it, ready for
+                  analysis or import into your business systems.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
       <section id="features" className="py-16 px-8 bg-white">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
@@ -239,66 +325,105 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* How It Works - Simplified */}
-      <section id="how-it-works" className="py-16 px-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+      {/* FAQ Section - NEW */}
+      <section id="faq" className="py-16 px-8 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How It Works
+            Frequently Asked Questions
           </h2>
 
-          <div className="flex flex-col space-y-6">
-            {[
-              {
-                step: 1,
-                title: "Upload Your Documents",
-                description:
-                  "Upload forms, receipts, or invoices through our drag-and-drop interface.",
-              },
-              {
-                step: 2,
-                title: "Create Extraction Templates",
-                description:
-                  "Specify exactly what data to extract with our intuitive template builder.",
-              },
-              {
-                step: 3,
-                title: "Apply Templates to Extract Data",
-                description:
-                  "Process your forms and extract data according to your template rules.",
-              },
-              {
-                step: 4,
-                title: "Review and Edit Results",
-                description:
-                  "Review extracted data and make any necessary corrections.",
-              },
-              {
-                step: 5,
-                title: "Export to Your Preferred Format",
-                description:
-                  "Export structured data in CSV, Excel, or JSON format.",
-              },
-            ].map((step) => (
-              <div
-                key={step.step}
-                className="flex items-start bg-white p-6 rounded-lg shadow-sm border border-gray-100"
-              >
-                <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                  <span className="text-blue-600 font-bold">{step.step}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            {/* Question 1 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                Do you store my uploaded form images?
+              </h3>
+              <p className="text-gray-600">
+                No, we do not store your uploaded images. All processing is done
+                in real-time, and the images are not saved on our servers after
+                extraction is complete. Your data privacy and security are our
+                top priorities.
+              </p>
+            </div>
+
+            {/* Question 2 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                How can I provide feedback or report issues?
+              </h3>
+              <p className="text-gray-600">
+                We welcome your feedback! You can email us at
+                <a
+                  href="mailto:bofeng1997@gmail.com"
+                  className="text-blue-600 ml-1"
+                >
+                  bofeng1997@gmail.com
+                </a>{" "}
+                or leave a message on{" "}
+                <a href="https://x.com/bofeng1997" className="text-blue-600">
+                  X
+                </a>
+                . We respond to all feedback promptly and are constantly
+                improving based on user suggestions.
+              </p>
+            </div>
+
+            {/* Question 3 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                Can I get a refund if I'm not satisfied?
+              </h3>
+              <p className="text-gray-600">
+                Yes! You get 50 free extractions per month to test our service.
+                If you subscribe and aren't satisfied with the service, we offer
+                a full refund. Just contact our support team within 14 days of
+                your purchase.
+              </p>
+            </div>
+
+            {/* Question 4 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                What types of documents can FormSense process?
+              </h3>
+              <p className="text-gray-600">
+                FormSense can process a wide variety of documents including
+                invoices, receipts, forms, applications, and any document with
+                structured data. Our system works best with documents that have
+                a consistent format.
+              </p>
+            </div>
+
+            {/* Question 5 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                How accurate is the data extraction?
+              </h3>
+              <p className="text-gray-600">
+                Our AI-powered extraction typically achieves 90-95% accuracy on
+                clear, well-formatted documents. The accuracy improves over time
+                as our system learns from corrections and adjustments made to
+                templates.
+              </p>
+            </div>
+
+            {/* Question 6 */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                Can I integrate FormSense with my existing systems?
+              </h3>
+              <p className="text-gray-600">
+                Yes, FormSense offers API access that allows you to integrate
+                our data extraction capabilities directly into your existing
+                workflows and business systems. Check out our developer
+                documentation for more details.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Section - With Free Tier Added */}
+      {/* Pricing Section */}
       <section id="pricing" className="py-16 px-8 bg-white">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-12">
@@ -469,7 +594,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Footer - Simplified */}
+      {/* Footer */}
       <footer className="py-10 px-8 bg-gray-900 text-gray-400">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
@@ -511,6 +636,11 @@ export default async function Home() {
               <li>
                 <a href="#" className="hover:text-white">
                   Contact
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-white">
+                  FAQ
                 </a>
               </li>
             </ul>
