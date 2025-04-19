@@ -1,4 +1,4 @@
-// src/app/page.tsx
+import Image from "next/image";
 import Link from "next/link";
 import { BsTwitterX } from "react-icons/bs";
 import { FaRegLightbulb } from "react-icons/fa";
@@ -78,7 +78,7 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Simplified */}
+      {/* Hero Section - 添加了新的宣传图片 */}
       <section className="py-16 px-8 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
@@ -105,72 +105,44 @@ export default async function Home() {
               </a>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">
-              Transform Your Document Processing
-            </h3>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Process hundreds of documents at once
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Extract specific fields or entire forms
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-green-500 mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-gray-700">
-                  Export to CSV, Excel, or JSON
-                </span>
-              </li>
-            </ul>
+          {/* 新添加的宣传图片 */}
+          <div className="relative">
+            <Image
+              src="/form-to-excel.jpg"
+              alt="Extract form fields to Excel"
+              width={600}
+              height={500}
+              className="rounded-lg shadow-lg"
+            />
           </div>
         </div>
       </section>
 
+      {/* 在Features部分之前添加新的产品展示区，展示实际应用界面 */}
+      <section className="py-12 px-8 bg-white">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Transform Your Document Processing
+          </h2>
+          <div className="mb-10">
+            <Image
+              src="/app-dashboard.jpg"
+              alt="FormSense - Application Dashboard"
+              width={1000}
+              height={600}
+              className="mx-auto rounded-lg shadow-xl border border-gray-200"
+            />
+          </div>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            Our intuitive interface makes it easy to upload form images, extract
+            data using templates, and export the results to Excel with just a
+            few clicks.
+          </p>
+        </div>
+      </section>
+
       {/* Features Section - Redesigned */}
-      <section id="features" className="py-16 px-8 bg-white">
+      <section id="features" className="py-16 px-8 bg-gray-50">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Key Features
@@ -233,65 +205,6 @@ export default async function Home() {
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works - Simplified */}
-      <section id="how-it-works" className="py-16 px-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How It Works
-          </h2>
-
-          <div className="flex flex-col space-y-6">
-            {[
-              {
-                step: 1,
-                title: "Upload Your Documents",
-                description:
-                  "Upload forms, receipts, or invoices through our drag-and-drop interface.",
-              },
-              {
-                step: 2,
-                title: "Create Extraction Templates",
-                description:
-                  "Specify exactly what data to extract with our intuitive template builder.",
-              },
-              {
-                step: 3,
-                title: "Apply Templates to Extract Data",
-                description:
-                  "Process your forms and extract data according to your template rules.",
-              },
-              {
-                step: 4,
-                title: "Review and Edit Results",
-                description:
-                  "Review extracted data and make any necessary corrections.",
-              },
-              {
-                step: 5,
-                title: "Export to Your Preferred Format",
-                description:
-                  "Export structured data in CSV, Excel, or JSON format.",
-              },
-            ].map((step) => (
-              <div
-                key={step.step}
-                className="flex items-start bg-white p-6 rounded-lg shadow-sm border border-gray-100"
-              >
-                <div className="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                  <span className="text-blue-600 font-bold">{step.step}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </div>
               </div>
             ))}
           </div>
