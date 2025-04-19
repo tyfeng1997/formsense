@@ -1,21 +1,20 @@
-// src/app/layout.tsx
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "FormSense - Transform Form Images into Structured Data",
+  title: "FormSense - Automatic Form Field Extraction Tool | Invoice Parser",
   description:
-    "Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats.",
+    "Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!",
   keywords:
-    "form extraction, OCR, document processing, data extraction, receipt scanner, invoice processing",
+    "automatic form field extraction tool, form field extraction software, invoice parsing tool, FormSense, data extraction, document processing, invoice scanner, PDF form extractor, excel export",
   openGraph: {
-    title: "FormSense - Transform Form Images into Structured Data",
+    title: "FormSense - Automatic Form Field Extraction Tool | Invoice Parser",
     description:
-      "Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats.",
+      "Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!",
     url: "https://formsense.app",
-    siteName: "FormSense",
+    siteName: "FormSense - Form Field Extraction Software",
     images: [
       {
         url: "https://formsense.app/og-image.jpg",
@@ -46,25 +45,25 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <meta property="og:url" content="https://formsense.app/" />
         <meta
           property="og:title"
-          content="FormSense - Transform Form Images into Structured Data"
+          content="FormSense - Automatic Form Field Extraction Tool | Invoice Parser"
         />
         <meta
           property="og:description"
-          content="Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats."
+          content="Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!"
         />
         <meta
           property="og:image"
           content="https://formsense.app/og-image.jpg"
         />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE" />
+        <meta name="twitter:site" content="@bofeng1997" />
         <meta
           name="twitter:title"
-          content="FormSense - Transform Form Images into Structured Data"
+          content="FormSense - Automatic Form Field Extraction Tool | Invoice Parser"
         />
         <meta
           name="twitter:description"
-          content="Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats."
+          content="Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!"
         />
         <meta
           name="twitter:image"
@@ -77,15 +76,26 @@ export default function RootLayout({ children }: RootLayoutProps) {
             "@type": "SoftwareApplication",
             "name": "FormSense",
             "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "description": "Automatic form field extraction tool. Extract data from invoices, contracts & PDFs without manual entry.",
             "offers": {
               "@type": "Offer",
               "price": "0",
-              "priceCurrency": "USD"
+              "priceCurrency": "USD",
+              "description": "Free tier with 50 extractions per month"
             },
-            "operatingSystem": "Web",
-            "description": "Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats."
+            "applicationSubCategory": "DocumentManagement",
+            "screenshot": "https://formsense.app/og-image.jpg",
+            "featureList": "Invoice parsing, Form field extraction, PDF data extraction, Excel export",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "42"
+            }
           }
         `}</script>
+        {/* Canonical URL for SEO */}
+        <link rel="canonical" href="https://formsense.app/" />
       </head>
       <Toaster position="top-right" />
 

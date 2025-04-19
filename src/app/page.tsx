@@ -9,17 +9,17 @@ import { AiOutlineApi } from "react-icons/ai";
 import { createClient } from "@/utils/supabase/server";
 
 export const metadata = {
-  title: "FormSense - Transform Form Images into Structured Data",
+  title: "FormSense - Automatic Form Field Extraction Tool | Invoice Parser",
   description:
-    "Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats.",
+    "Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!",
   keywords:
-    "form extraction, OCR, document processing, data extraction, receipt scanner, invoice processing",
+    "automatic form field extraction tool, form field extraction software, invoice parsing tool, FormSense, data extraction, document processing, invoice scanner, PDF form extractor, excel export",
   openGraph: {
-    title: "FormSense - Transform Form Images into Structured Data",
+    title: "FormSense - Automatic Form Field Extraction Tool | Invoice Parser",
     description:
-      "Batch convert form images to structured data with high accuracy. Extract specific fields or entire forms and export to various formats.",
+      "Free yourself from manual data entry. Extract form fields automatically from invoices, contracts & PDFs. One-click export to Excel. Try FormSense now!",
     url: "https://formsense.app",
-    siteName: "FormSense",
+    siteName: "FormSense - Form Field Extraction Software",
     images: [
       {
         url: "https://formsense.app/og-image.jpg",
@@ -43,6 +43,9 @@ export default async function Home() {
       <nav className="flex justify-between items-center py-4 px-8 border-b">
         <div className="flex items-center">
           <span className="text-xl font-bold text-blue-600">FormSense</span>
+          <span className="ml-2 text-sm text-gray-500">
+            Form Field Extraction Software
+          </span>
         </div>
         <div className="flex items-center space-x-6">
           <a href="#features" className="text-gray-600 hover:text-blue-600">
@@ -72,30 +75,31 @@ export default async function Home() {
               href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition"
             >
-              Login / Sign Up
+              Try Free
             </Link>
           )}
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - SEO Optimized */}
       <section className="py-16 px-8 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-              Turn Form Images Into{" "}
-              <span className="text-blue-600">Structured Data</span>
+              <span className="text-blue-600">Free Yourself</span> From Manual
+              Form Entry Hell
             </h1>
             <p className="mt-4 text-lg text-gray-600">
-              Extract data from forms, receipts, and invoices with AI. Process
-              hundreds of documents at once.
+              Simply upload invoices or web forms to intelligently recognize
+              customer information, amounts, dates, and export to Excel with one
+              click! The ultimate automatic form field extraction tool.
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/login"
                 className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-md font-medium transition"
               >
-                Try for Free
+                Use Now
               </Link>
               <a
                 href="#how-it-works"
@@ -108,7 +112,7 @@ export default async function Home() {
           <div className="relative">
             <Image
               src="/form-to-excel.jpg"
-              alt="Extract form fields to Excel"
+              alt="FormSense - Automatic form field extraction tool"
               width={600}
               height={500}
               className="rounded-lg shadow-lg"
@@ -117,26 +121,83 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Product Showcase */}
+      {/* Product Showcase with Key Benefits - SEO Optimized */}
       <section className="py-12 px-8 bg-white">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Transform Your Document Processing
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+            Automatic Form Field Extraction Tool for Every Business Need
           </h2>
-          <div className="mb-10">
+          <div className="mb-10 text-center">
             <Image
               src="/app-dashboard.jpg"
-              alt="FormSense - Application Dashboard"
+              alt="FormSense - Invoice parsing tool dashboard"
               width={1000}
               height={600}
               className="mx-auto rounded-lg shadow-xl border border-gray-200"
             />
           </div>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            Our intuitive interface makes it easy to upload form images, extract
-            data using templates, and export the results to Excel with just a
-            few clicks.
-          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                Comprehensive Document Support
+              </h3>
+              <p className="text-gray-700">
+                Process invoices, contracts, onboarding forms, PDFs and other
+                structured documents
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                Intelligent Field Extraction
+              </h3>
+              <p className="text-gray-700">
+                Automatically extract company names, amounts, customer addresses
+                and other fields
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                One-Click Export
+              </h3>
+              <p className="text-gray-700">
+                Download your data in Excel, CSV and other formats with a single
+                click
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                No Installation Required
+              </h3>
+              <p className="text-gray-700">
+                Use directly in your browser without downloading or installing
+                software
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                Multi-Department Usage
+              </h3>
+              <p className="text-gray-700">
+                Perfect for bookkeeping, finance, HR, customer management and
+                more
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              <h3 className="font-semibold text-lg text-blue-800 mb-2">
+                Time-Saving Automation
+              </h3>
+              <p className="text-gray-700">
+                Cut hours of manual data entry with our intelligent AI
+                extraction system
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
